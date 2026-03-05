@@ -30,7 +30,8 @@ const copy = {
     need: "Need an account? Create one",
     checkInbox: "Account created. Check your email to confirm your account before signing in.",
     accountReady: "Account created. Redirecting to dashboard...",
-    unexpected: "Unexpected auth response. Please try again."
+    unexpected: "Unexpected auth response. Please try again.",
+    requestFailed: "Request failed. Check your Supabase URL/keys and internet connection."
   },
   es: {
     createAccount: "Crear cuenta",
@@ -42,7 +43,8 @@ const copy = {
     need: "¿Necesitas cuenta? Crear una",
     checkInbox: "Cuenta creada. Revisa tu correo para confirmar la cuenta antes de iniciar sesión.",
     accountReady: "Cuenta creada. Redirigiendo al dashboard...",
-    unexpected: "Respuesta inesperada de autenticación. Intenta de nuevo."
+    unexpected: "Respuesta inesperada de autenticación. Intenta de nuevo.",
+    requestFailed: "La solicitud falló. Revisa URL/keys de Supabase y tu conexión a internet."
   }
 } as const;
 
@@ -67,14 +69,37 @@ export default function SignInPage() {
     setInfoMessage(null);
     const supabase = getSupabaseBrowserClient();
 
-    if (isSignUp) {
-      const appUrl = process.env.NEXT_PUBLIC_APP_URL ?? window.location.origin;
-      const emailRedirectTo = `${appUrl.replace(/\/$/, "")}/dashboard`;
+    try {
+      if (isSignUp) {
+        const { data, error } = await supabase.auth.signUp({
+          email: values.email,
+          password: values.password
+        });
 
-      const { data, error } = await supabase.auth.signUp({
+        if (error) {
+          setErrorMessage(error.message);
+          return;
+        }
+
+        if (data.session) {
+          setInfoMessage(c.accountReady);
+          router.push("/dashboard");
+          router.refresh();
+          return;
+        }
+
+        if (data.user) {
+          setInfoMessage(c.checkInbox);
+          return;
+        }
+
+        setErrorMessage(c.unexpected);
+        return;
+      }
+
+      const { error } = await supabase.auth.signInWithPassword({
         email: values.email,
-        password: values.password,
-        options: { emailRedirectTo }
+        password: values.password
       });
 
       if (error) {
@@ -82,34 +107,12 @@ export default function SignInPage() {
         return;
       }
 
-      if (data.session) {
-        setInfoMessage(c.accountReady);
-        router.push("/dashboard");
-        router.refresh();
-        return;
-      }
-
-      if (data.user) {
-        setInfoMessage(c.checkInbox);
-        return;
-      }
-
-      setErrorMessage(c.unexpected);
-      return;
+      router.push("/dashboard");
+      router.refresh();
+    } catch (error) {
+      const message = error instanceof Error ? error.message : c.requestFailed;
+      setErrorMessage(message || c.requestFailed);
     }
-
-    const { error } = await supabase.auth.signInWithPassword({
-      email: values.email,
-      password: values.password
-    });
-
-    if (error) {
-      setErrorMessage(error.message);
-      return;
-    }
-
-    router.push("/dashboard");
-    router.refresh();
   };
 
   return (
@@ -136,8 +139,8 @@ export default function SignInPage() {
             <Button type="button" variant="ghost" className="w-full" onClick={() => setIsSignUp((prev) => !prev)}>
               {isSignUp ? c.already : c.need}
             </Button>
-            {errorMessage ? <p className="text-xs text-destructive">{errorMessage}</p> : null}
-            {infoMessage ? <p className="text-xs text-emerald-600">{infoMessage}</p> : null}
+            {errorMessage ? <p className="rounded-md border border-destructive/30 bg-destructive/10 p-2 text-xs text-destructive">{errorMessage}</p> : null}
+            {infoMessage ? <p className="rounded-md border border-emerald-400/40 bg-emerald-500/10 p-2 text-xs text-emerald-700">{infoMessage}</p> : null}
           </form>
         </CardContent>
       </Card>
