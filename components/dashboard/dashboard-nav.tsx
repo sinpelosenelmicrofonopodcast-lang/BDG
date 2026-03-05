@@ -23,7 +23,8 @@ const copy = {
     messages: "Messages",
     billing: "Billing",
     audit: "Audit",
-    settings: "Settings"
+    settings: "Settings",
+    testimonials: "Testimonials"
   },
   es: {
     menu: "menú",
@@ -38,7 +39,8 @@ const copy = {
     messages: "Mensajes",
     billing: "Facturación",
     audit: "Auditoría",
-    settings: "Configuración"
+    settings: "Configuración",
+    testimonials: "Testimonios"
   }
 } as const;
 
@@ -60,6 +62,7 @@ export function DashboardNav({ role }: DashboardNavProps) {
     { href: "/dashboard/admin/messages", label: c.messages },
     { href: "/dashboard/admin/billing", label: c.billing },
     { href: "/dashboard/admin/audit", label: c.audit },
+    { href: "/dashboard/admin/testimonials", label: c.testimonials },
     { href: "/dashboard/admin/settings", label: c.settings }
   ];
 

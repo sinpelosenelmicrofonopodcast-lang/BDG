@@ -27,7 +27,10 @@ const copy = {
     password: "Password",
     loading: "Please wait...",
     already: "Already have an account? Sign in",
-    need: "Need an account? Create one"
+    need: "Need an account? Create one",
+    checkInbox: "Account created. Check your email to confirm your account before signing in.",
+    accountReady: "Account created. Redirecting to dashboard...",
+    unexpected: "Unexpected auth response. Please try again."
   },
   es: {
     createAccount: "Crear cuenta",
@@ -36,7 +39,10 @@ const copy = {
     password: "Contraseña",
     loading: "Espera...",
     already: "¿Ya tienes cuenta? Inicia sesión",
-    need: "¿Necesitas cuenta? Crear una"
+    need: "¿Necesitas cuenta? Crear una",
+    checkInbox: "Cuenta creada. Revisa tu correo para confirmar la cuenta antes de iniciar sesión.",
+    accountReady: "Cuenta creada. Redirigiendo al dashboard...",
+    unexpected: "Respuesta inesperada de autenticación. Intenta de nuevo."
   }
 } as const;
 
@@ -46,6 +52,7 @@ export default function SignInPage() {
   const c = copy[locale];
   const [isSignUp, setIsSignUp] = useState(false);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
+  const [infoMessage, setInfoMessage] = useState<string | null>(null);
 
   const {
     register,
@@ -57,12 +64,17 @@ export default function SignInPage() {
 
   const onSubmit = async (values: AuthValues) => {
     setErrorMessage(null);
+    setInfoMessage(null);
     const supabase = getSupabaseBrowserClient();
 
     if (isSignUp) {
-      const { error } = await supabase.auth.signUp({
+      const appUrl = process.env.NEXT_PUBLIC_APP_URL ?? window.location.origin;
+      const emailRedirectTo = `${appUrl.replace(/\/$/, "")}/dashboard`;
+
+      const { data, error } = await supabase.auth.signUp({
         email: values.email,
-        password: values.password
+        password: values.password,
+        options: { emailRedirectTo }
       });
 
       if (error) {
@@ -70,8 +82,19 @@ export default function SignInPage() {
         return;
       }
 
-      router.push("/dashboard/client");
-      router.refresh();
+      if (data.session) {
+        setInfoMessage(c.accountReady);
+        router.push("/dashboard");
+        router.refresh();
+        return;
+      }
+
+      if (data.user) {
+        setInfoMessage(c.checkInbox);
+        return;
+      }
+
+      setErrorMessage(c.unexpected);
       return;
     }
 
@@ -114,6 +137,7 @@ export default function SignInPage() {
               {isSignUp ? c.already : c.need}
             </Button>
             {errorMessage ? <p className="text-xs text-destructive">{errorMessage}</p> : null}
+            {infoMessage ? <p className="text-xs text-emerald-600">{infoMessage}</p> : null}
           </form>
         </CardContent>
       </Card>

@@ -8,6 +8,7 @@ import { PricingCards } from "@/components/marketing/pricing-cards";
 import { PlanComparison } from "@/components/marketing/plan-comparison";
 import { FaqSection } from "@/components/marketing/faq-section";
 import { LeadMagnetForm } from "@/components/marketing/lead-magnet-form";
+import { TestimonialsSection } from "@/components/marketing/testimonials-section";
 
 const copy = {
   en: {
@@ -119,50 +120,12 @@ const portfolioByLocale = {
   es: ["Sitio de crecimiento para restaurante", "Funnel de leads HVAC", "App de reservas para clínica"]
 } as const;
 
-const testimonialsByLocale = {
-  en: [
-    {
-      quote: "We moved from referrals only to weekly lead generation with their web system.",
-      name: "Luis M.",
-      company: "HVAC Services Austin"
-    },
-    {
-      quote: "They delivered a platform with payments and admin dashboard in weeks, not months.",
-      name: "Andrea V.",
-      company: "Beauty Brand Houston"
-    },
-    {
-      quote: "The monthly plan keeps us growing without an in-house tech team.",
-      name: "Carlos R.",
-      company: "Real Estate Group Dallas"
-    }
-  ],
-  es: [
-    {
-      quote: "Pasamos de depender de referidos a generar leads semanales con su sistema web.",
-      name: "Luis M.",
-      company: "HVAC Services Austin"
-    },
-    {
-      quote: "Nos entregaron una plataforma con pagos y dashboard admin en semanas, no meses.",
-      name: "Andrea V.",
-      company: "Beauty Brand Houston"
-    },
-    {
-      quote: "El plan mensual nos mantiene creciendo sin tener un equipo tech interno.",
-      name: "Carlos R.",
-      company: "Real Estate Group Dallas"
-    }
-  ]
-} as const;
-
 export default async function HomePage() {
   const locale = await getServerLocale();
   const c = copy[locale];
   const services = servicesByLocale[locale];
   const executionSteps = processByLocale[locale];
   const portfolio = portfolioByLocale[locale];
-  const testimonials = testimonialsByLocale[locale];
 
   return (
     <div className="pb-20">
@@ -269,23 +232,7 @@ export default async function HomePage() {
           ))}
         </div>
       </section>
-
-      <section className="container-shell py-10">
-        <SectionTitle eyebrow={c.testimonialsEyebrow} title={c.testimonialsTitle} className="mb-7" />
-        <div className="grid gap-5 md:grid-cols-3">
-          {testimonials.map((item) => (
-            <Card key={item.name}>
-              <CardContent className="space-y-4 pt-6">
-                <p className="text-sm">&ldquo;{item.quote}&rdquo;</p>
-                <div>
-                  <p className="font-semibold">{item.name}</p>
-                  <p className="text-xs text-muted-foreground">{item.company}</p>
-                </div>
-              </CardContent>
-            </Card>
-          ))}
-        </div>
-      </section>
+      <TestimonialsSection locale={locale} eyebrow={c.testimonialsEyebrow} title={c.testimonialsTitle} />
 
       <section className="container-shell space-y-8 py-10">
         <SectionTitle eyebrow={c.faqEyebrow} title={c.faqTitle} />
