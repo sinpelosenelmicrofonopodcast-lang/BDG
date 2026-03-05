@@ -7,6 +7,7 @@ import { WhatsAppButton } from "@/components/layout/whatsapp-button";
 import { AnalyticsProvider } from "@/components/analytics/analytics-provider";
 import { LanguageProvider } from "@/components/i18n/language-provider";
 import { getServerLocale } from "@/lib/i18n/server";
+import { getCurrentUserRole } from "@/lib/auth";
 
 export const metadata: Metadata = {
   metadataBase: new URL(process.env.NEXT_PUBLIC_APP_URL ?? "http://localhost:3000"),
@@ -32,12 +33,24 @@ export const metadata: Metadata = {
 export default async function RootLayout({ children }: Readonly<{ children: React.ReactNode }>) {
   const locale = await getServerLocale();
 
+  let isAdmin = false;
+  const hasSupabaseConfig = Boolean(process.env.NEXT_PUBLIC_SUPABASE_URL && process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY);
+
+  if (hasSupabaseConfig) {
+    try {
+      const role = await getCurrentUserRole();
+      isAdmin = role === "admin";
+    } catch {
+      isAdmin = false;
+    }
+  }
+
   return (
     <html lang={locale}>
       <body className="font-body">
         <LanguageProvider initialLocale={locale}>
           <AnalyticsProvider />
-          <SiteHeader />
+          <SiteHeader isAdmin={isAdmin} />
           <main>{children}</main>
           <SiteFooter />
           <StickyMobileCta />

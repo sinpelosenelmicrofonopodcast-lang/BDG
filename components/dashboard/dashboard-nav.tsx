@@ -14,6 +14,7 @@ const copy = {
     menu: "menu",
     clientPortal: "Client Portal",
     overview: "Overview",
+    inbox: "Inbox",
     clients: "Clients",
     projects: "Projects",
     plans: "Plans",
@@ -30,6 +31,7 @@ const copy = {
     menu: "menú",
     clientPortal: "Portal Cliente",
     overview: "Resumen",
+    inbox: "Inbox",
     clients: "Clientes",
     projects: "Proyectos",
     plans: "Planes",
@@ -53,6 +55,7 @@ export function DashboardNav({ role }: DashboardNavProps) {
 
   const adminLinks = [
     { href: "/dashboard/admin/overview", label: c.overview },
+    { href: "/dashboard/admin/inbox", label: c.inbox },
     { href: "/dashboard/admin/clients", label: c.clients },
     { href: "/dashboard/admin/projects", label: c.projects },
     { href: "/dashboard/admin/plans", label: c.plans },

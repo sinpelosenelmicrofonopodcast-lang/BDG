@@ -9,6 +9,10 @@ import { LanguageToggle } from "@/components/layout/language-toggle";
 import { useLanguage } from "@/components/i18n/language-provider";
 import { cn } from "@/lib/utils";
 
+type SiteHeaderProps = {
+  isAdmin?: boolean;
+};
+
 const navLabels = {
   en: {
     pricing: "Pricing",
@@ -18,6 +22,8 @@ const navLabels = {
     contact: "Contact",
     namePlan: "Name Your Plan",
     getQuote: "Get Quote",
+    adminDashboard: "Admin Dashboard",
+    adminShort: "Admin",
     constructionBanner: "Under construction. Better improvements for you are coming soon."
   },
   es: {
@@ -28,16 +34,20 @@ const navLabels = {
     contact: "Contacto",
     namePlan: "Nombra tu plan",
     getQuote: "Cotizar",
+    adminDashboard: "Panel Admin",
+    adminShort: "Admin",
     constructionBanner: "En construcción. Pronto vienen mejoras para ustedes."
   }
 } as const;
 
-export function SiteHeader() {
+export function SiteHeader({ isAdmin = false }: SiteHeaderProps) {
   const pathname = usePathname();
   const { locale } = useLanguage();
   const c = navLabels[locale];
+  const adminHref = "/dashboard/admin/overview";
 
   const links = [
+    ...(isAdmin ? [{ href: adminHref, label: c.adminDashboard }] : []),
     { href: "/pricing", label: c.pricing },
     { href: "/addons", label: c.addons },
     { href: "/case-studies", label: c.caseStudies },
@@ -52,7 +62,7 @@ export function SiteHeader() {
       </div>
 
       <div className="container-shell flex h-16 items-center justify-between gap-4">
-        <Link href="/" className="inline-flex items-center gap-3">
+        <Link href={isAdmin ? adminHref : "/"} className="inline-flex items-center gap-3">
           <Image src="/logo.png" alt="BDG" width={132} height={44} priority className="h-9 w-auto rounded-sm border border-border/50" />
         </Link>
 
@@ -73,6 +83,11 @@ export function SiteHeader() {
 
         <div className="hidden items-center gap-3 md:flex">
           <LanguageToggle />
+          {isAdmin ? (
+            <Button asChild variant="outline" size="sm">
+              <Link href={adminHref}>{c.adminDashboard}</Link>
+            </Button>
+          ) : null}
           <Button asChild variant="ghost" size="sm">
             <Link href="/name-your-plan">{c.namePlan}</Link>
           </Button>
@@ -81,8 +96,13 @@ export function SiteHeader() {
           </Button>
         </div>
 
-        <div className="md:hidden">
+        <div className="flex items-center gap-2 md:hidden">
           <LanguageToggle />
+          {isAdmin ? (
+            <Button asChild variant="outline" size="sm">
+              <Link href={adminHref}>{c.adminShort}</Link>
+            </Button>
+          ) : null}
         </div>
 
         <Button variant="ghost" size="icon" className="md:hidden" aria-label="Open menu">
