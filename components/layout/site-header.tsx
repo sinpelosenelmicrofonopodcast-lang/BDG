@@ -17,7 +17,8 @@ const navLabels = {
     blog: "Blog",
     contact: "Contact",
     namePlan: "Name Your Plan",
-    getQuote: "Get Quote"
+    getQuote: "Get Quote",
+    constructionBanner: "Under construction. Better improvements for you are coming soon."
   },
   es: {
     pricing: "Precios",
@@ -26,7 +27,8 @@ const navLabels = {
     blog: "Blog",
     contact: "Contacto",
     namePlan: "Nombra tu plan",
-    getQuote: "Cotizar"
+    getQuote: "Cotizar",
+    constructionBanner: "En construcción. Pronto vienen mejoras para ustedes."
   }
 } as const;
 
@@ -45,6 +47,10 @@ export function SiteHeader() {
 
   return (
     <header className="sticky top-0 z-50 border-b border-border/80 bg-background/90 backdrop-blur">
+      <div className="border-b border-primary/20 bg-primary/10 px-4 py-2 text-center text-xs font-semibold tracking-wide text-primary">
+        {c.constructionBanner}
+      </div>
+
       <div className="container-shell flex h-16 items-center justify-between gap-4">
         <Link href="/" className="inline-flex items-center gap-3">
           <Image src="/logo.png" alt="BDG" width={132} height={44} priority className="h-9 w-auto rounded-sm border border-border/50" />
