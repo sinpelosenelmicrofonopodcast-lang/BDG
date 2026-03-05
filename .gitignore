@@ -4,4 +4,4 @@ node_modules
 .env
 .vercel
 .DS_Store
-pnpm-lock.yaml
+*.tsbuildinfo
