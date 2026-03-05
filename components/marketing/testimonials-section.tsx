@@ -26,22 +26,35 @@ type TestimonialCard = {
 };
 
 export async function TestimonialsSection({ locale, eyebrow, title }: TestimonialsSectionProps) {
-  const supabase = await getSupabaseServerClient();
-  const { data, error } = await supabase
-    .from("testimonials")
-    .select("id,full_name,company_name,company_role,quote_en,quote_es")
-    .eq("active", true)
-    .eq("is_featured", true)
-    .order("sort_order", { ascending: true })
-    .order("created_at", { ascending: false })
-    .limit(6);
+  const hasSupabaseConfig = Boolean(process.env.NEXT_PUBLIC_SUPABASE_URL && process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY);
 
-  if (error || !data?.length) {
+  if (!hasSupabaseConfig) {
+    return null;
+  }
+
+  let rows: TestimonialRow[] = [];
+
+  try {
+    const supabase = await getSupabaseServerClient();
+    const { data, error } = await supabase
+      .from("testimonials")
+      .select("id,full_name,company_name,company_role,quote_en,quote_es")
+      .eq("active", true)
+      .eq("is_featured", true)
+      .order("sort_order", { ascending: true })
+      .order("created_at", { ascending: false })
+      .limit(6);
+
+    if (error || !data?.length) {
+      return null;
+    }
+
+    rows = data as TestimonialRow[];
+  } catch {
     return null;
   }
 
   const fallbackCompany = locale === "es" ? "Cliente verificado" : "Verified client";
-  const rows = data as TestimonialRow[];
 
   const items = rows
     .map((row): TestimonialCard | null => {
