@@ -1,66 +1,53 @@
 import { projectPlans } from "@/lib/constants";
 import type { Locale } from "@/lib/i18n/config";
+import { currency } from "@/lib/utils";
 
 const copy = {
   en: {
     headers: {
       plan: "Plan",
       bestFor: "Best For",
-      range: "Range",
+      investment: "Investment",
       includes: "Includes"
     },
     descriptions: {
-      "starter-landing": "Fast launch for first digital sales.",
-      "business-website": "Service businesses scaling lead generation.",
-      "small-business-quote": "Small businesses needing a tailored quote based on priorities.",
-      "growth-system": "Companies optimizing sales operations.",
-      "app-platform": "Teams building internal or client-facing software.",
-      enterprise: "Complex operations with custom architecture."
+      "starter-local": "Food trucks, barbers, salons and small businesses.",
+      "business-local": "Restaurants, travel agencies and local service operations.",
+      "pro-local": "High-volume businesses needing full automation.",
+      "realtors-dealers": "Realtors and dealers managing dynamic listings."
     },
     includes: {
-      "starter-landing": "1 page • WhatsApp • Basic SEO",
-      "business-website": "5-8 pages • SEO • Analytics",
-      "small-business-quote": "Custom scope • Phased roadmap • Modular build",
-      "growth-system": "Premium web • Booking • CRM",
-      "app-platform": "Login • Roles • Payments",
-      enterprise: "Custom scope • Architecture • Priority support"
+      "starter-local": "Mobile page • WhatsApp/call • Maps • Hosting",
+      "business-local": "Starter + bookings/orders • Admin panel • Local SEO",
+      "pro-local": "Business + dashboard • Database • Analytics • Promotions",
+      "realtors-dealers": "Listings • Lead forms • Notifications • Listings panel"
     },
-    requestQuote: "Request quote"
+    setup: "setup",
+    month: "/ month"
   },
   es: {
     headers: {
       plan: "Plan",
       bestFor: "Ideal para",
-      range: "Rango",
+      investment: "Inversion",
       includes: "Incluye"
     },
     descriptions: {
-      "starter-landing": "Lanzamiento rápido para primeras ventas digitales.",
-      "business-website": "Negocios de servicios que escalan leads.",
-      "small-business-quote": "Pequeños negocios que necesitan cotización a medida según prioridades.",
-      "growth-system": "Empresas optimizando operación comercial.",
-      "app-platform": "Equipos construyendo software interno o para clientes.",
-      enterprise: "Operaciones complejas con arquitectura personalizada."
+      "starter-local": "Food trucks, barberos, esteticas y pequenos negocios.",
+      "business-local": "Restaurantes, agencias de viajes y servicios locales.",
+      "pro-local": "Negocios con mayor volumen que necesitan automatizacion completa.",
+      "realtors-dealers": "Realtors y dealers con operacion de listings activa."
     },
     includes: {
-      "starter-landing": "1 página • WhatsApp • SEO básico",
-      "business-website": "5-8 páginas • SEO • Analytics",
-      "small-business-quote": "Scope personalizado • Roadmap por fases • Build modular",
-      "growth-system": "Web premium • Booking • CRM",
-      "app-platform": "Login • Roles • Pagos",
-      enterprise: "Scope custom • Arquitectura • Soporte prioritario"
+      "starter-local": "Pagina movil • WhatsApp/llamada • Maps • Hosting",
+      "business-local": "Starter + reservas/ordenes • Panel admin • SEO local",
+      "pro-local": "Business + dashboard • Base de datos • Analytics • Promociones",
+      "realtors-dealers": "Listings • Formularios lead • Notificaciones • Panel listings"
     },
-    requestQuote: "Solicitar quote"
+    setup: "setup",
+    month: "/ mes"
   }
 } as const;
-
-function shouldHidePrice(priceMin: number, priceMax: number, billingType: string) {
-  if (billingType === "quote_only") {
-    return true;
-  }
-
-  return priceMin >= 5000 || priceMax >= 5000;
-}
 
 export function PlanComparison({ locale }: { locale: Locale }) {
   const c = copy[locale];
@@ -72,23 +59,21 @@ export function PlanComparison({ locale }: { locale: Locale }) {
           <tr className="bg-secondary/60 text-left">
             <th className="px-4 py-3 font-semibold">{c.headers.plan}</th>
             <th className="px-4 py-3 font-semibold">{c.headers.bestFor}</th>
-            <th className="px-4 py-3 font-semibold">{c.headers.range}</th>
+            <th className="px-4 py-3 font-semibold">{c.headers.investment}</th>
             <th className="px-4 py-3 font-semibold">{c.headers.includes}</th>
           </tr>
         </thead>
         <tbody>
-          {projectPlans.map((plan) => {
-            const quoteOnly = shouldHidePrice(plan.priceMin, plan.priceMax, plan.billingType);
-
-            return (
-              <tr key={plan.slug} className="border-t border-border">
-                <td className="px-4 py-3 font-medium">{plan.name}</td>
-                <td className="px-4 py-3 text-muted-foreground">{c.descriptions[plan.slug]}</td>
-                <td className="px-4 py-3">{quoteOnly ? c.requestQuote : `$${plan.priceMin} - $${plan.priceMax}`}</td>
-                <td className="px-4 py-3">{c.includes[plan.slug]}</td>
-              </tr>
-            );
-          })}
+          {projectPlans.map((plan) => (
+            <tr key={plan.slug} className="border-t border-border">
+              <td className="px-4 py-3 font-medium">{plan.name}</td>
+              <td className="px-4 py-3 text-muted-foreground">{c.descriptions[plan.slug]}</td>
+              <td className="px-4 py-3">
+                {currency(plan.setupFee)} {c.setup} + {currency(plan.priceMin)} {c.month}
+              </td>
+              <td className="px-4 py-3">{c.includes[plan.slug]}</td>
+            </tr>
+          ))}
         </tbody>
       </table>
     </div>

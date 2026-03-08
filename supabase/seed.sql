@@ -1,110 +1,50 @@
 insert into public.plans (slug, name, category, billing_type, price_min, price_max, description, features, is_popular, active)
 values
   (
-    'starter-landing',
-    'Starter Landing',
+    'starter-local',
+    'STARTER',
     'project',
-    'one_time',
-    499,
-    899,
-    '1-page conversion landing for quick launch.',
-    '["1 page","WhatsApp","Form","Basic SEO","Responsive","Basic tracking"]'::jsonb,
+    'subscription',
+    29,
+    29,
+    'Presencia profesional online para negocios locales.',
+    '["Pagina profesional optimizada para celular","Informacion del negocio","Boton de llamada o WhatsApp","Google Maps integrado","Integracion con redes sociales","Hosting seguro","Mantenimiento basico","Notificaciones push basicas"]'::jsonb,
     false,
     true
   ),
   (
-    'business-website',
-    'Business Website',
+    'business-local',
+    'BUSINESS',
     'project',
-    'one_time',
-    1499,
-    2999,
-    'Professional website for established service businesses.',
-    '["5-8 pages","SEO","Performance","Optional blog","Analytics"]'::jsonb,
+    'subscription',
+    59,
+    59,
+    'Sistema para recibir clientes y administrar reservas u ordenes.',
+    '["Todo en Starter","Sistema de ordenes o reservas","Confirmacion automatica al cliente","Panel basico para administrar","Notificaciones push automaticas","Notificaciones por email","SEO local basico","Integracion con redes sociales"]'::jsonb,
     true,
     true
   ),
   (
-    'small-business-quote',
-    'Small Business Custom',
+    'pro-local',
+    'PRO',
     'project',
-    'quote_only',
-    0,
-    0,
-    'Flexible quote plan for small businesses based on real scope.',
-    '["Scope by need","Phased roadmap","Conversion-first approach","Modular execution"]'::jsonb,
-    false,
-    true
-  ),
-  (
-    'growth-system',
-    'Growth System',
-    'project',
-    'one_time',
-    3500,
-    6500,
-    'Growth-focused stack with automation and dashboards.',
-    '["Premium web","Booking","Simple CRM","Automations","Basic dashboard"]'::jsonb,
-    false,
-    true
-  ),
-  (
-    'app-platform',
-    'App Platform',
-    'project',
-    'one_time',
-    4000,
-    10000,
-    'App platform with auth, roles, payments and integrations.',
-    '["Login","Roles","Admin dashboard","Payments","Integrations"]'::jsonb,
-    false,
-    true
-  ),
-  (
-    'enterprise',
-    'Enterprise',
-    'project',
-    'quote_only',
-    10000,
-    0,
-    'Enterprise architecture and custom roadmap.',
-    '["Custom scope","Dedicated architecture","Priority support"]'::jsonb,
-    false,
-    true
-  ),
-  (
-    'care-plan',
-    'Care Plan',
-    'retainer',
     'subscription',
-    149,
-    149,
-    'Monthly maintenance and preventive support.',
-    '["Maintenance","Backups","Monthly support"]'::jsonb,
-    true,
-    true
-  ),
-  (
-    'seo-growth',
-    'SEO Growth',
-    'retainer',
-    'subscription',
-    399,
-    799,
-    'SEO and content growth retainer.',
-    '["Technical SEO","Content","Monthly report"]'::jsonb,
+    99,
+    99,
+    'Negocio automatizado con dashboard, analytics y promociones.',
+    '["Todo en Business","Dashboard completo de clientes","Control de ordenes o reservas","Base de datos de clientes","Promociones automaticas","Analytics del negocio","Landing pages para promociones","Sistema de notificaciones avanzado"]'::jsonb,
     false,
     true
   ),
   (
-    'automation-crm',
-    'Automation CRM',
-    'retainer',
+    'realtors-dealers',
+    'REALTORS / DEALERS',
+    'project',
     'subscription',
-    699,
-    1500,
-    'CRM and automation workflows for pipeline velocity.',
-    '["CRM setup","Automation flows","Pipeline optimization"]'::jsonb,
+    79,
+    79,
+    'Plan especial para realtors y dealers con sistema de listings.',
+    '["Pagina profesional","Listados de propiedades o autos","Formularios para leads","Notificaciones de nuevos clientes","Panel para administrar listings","Integracion con redes sociales"]'::jsonb,
     false,
     true
   )
@@ -121,18 +61,28 @@ set
   active = excluded.active,
   updated_at = now();
 
+update public.plans
+set active = false,
+    updated_at = now()
+where slug in (
+  'starter-landing',
+  'business-website',
+  'small-business-quote',
+  'growth-system',
+  'app-platform',
+  'enterprise',
+  'care-plan',
+  'seo-growth',
+  'automation-crm'
+);
+
 insert into public.addons (slug, name, billing_type, price_min, price_max, description, active)
 values
-  ('seo-pro', 'SEO Pro', 'one_time', 300, 800, 'Advanced SEO implementation.', true),
-  ('blog', 'Blog', 'one_time', 200, 500, 'Blog setup and structure.', true),
-  ('booking-system', 'Booking System', 'one_time', 300, 900, 'Appointment scheduling module.', true),
-  ('payments-stripe', 'Payments Stripe', 'one_time', 300, 700, 'Stripe checkout and billing setup.', true),
-  ('admin-dashboard', 'Admin Dashboard', 'one_time', 500, 1500, 'Operations and KPI dashboard.', true),
-  ('whatsapp-automation', 'WhatsApp Automation', 'one_time', 200, 600, 'Automated WhatsApp flows.', true),
-  ('social-integrations', 'Social Integrations', 'one_time', 150, 400, 'Instagram/Facebook integrations.', true),
-  ('user-accounts', 'User Accounts', 'one_time', 600, 1500, 'Auth and user profile module.', true),
-  ('pwa-app', 'PWA App', 'one_time', 500, 1200, 'Progressive Web App support.', true),
-  ('hosting-managed', 'Hosting Managed', 'subscription', 20, 80, 'Managed hosting and uptime checks.', true)
+  ('seo-local', 'SEO local', 'subscription', 79, 79, 'Optimizacion SEO local mensual.', true),
+  ('social-ads-management', 'Gestion de publicidad (Facebook / Instagram)', 'subscription', 149, 149, 'Gestion mensual de campanas pagadas.', true),
+  ('pro-photography', 'Fotografia profesional', 'one_time', 150, 150, 'Sesion fotografica profesional para marca o catalogo.', true),
+  ('social-videos-reels', 'Videos / Reels para redes', 'one_time', 120, 120, 'Produccion de piezas cortas para redes sociales.', true),
+  ('marketing-automation', 'Automatizacion de marketing', 'subscription', 59, 59, 'Flujos automaticos de seguimiento comercial.', true)
 on conflict (slug) do update
 set
   name = excluded.name,
@@ -142,3 +92,19 @@ set
   description = excluded.description,
   active = excluded.active,
   updated_at = now();
+
+update public.addons
+set active = false,
+    updated_at = now()
+where slug in (
+  'seo-pro',
+  'blog',
+  'booking-system',
+  'payments-stripe',
+  'admin-dashboard',
+  'whatsapp-automation',
+  'social-integrations',
+  'user-accounts',
+  'pwa-app',
+  'hosting-managed'
+);

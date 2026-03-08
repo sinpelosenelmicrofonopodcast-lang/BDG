@@ -9,8 +9,8 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 const copy = {
   en: {
     eyebrow: "Add-ons",
-    title: "Upsell modules to increase project value",
-    description: "Mix one-time and subscription add-ons based on each client growth stage.",
+    title: "Growth Add-ons for Local Businesses",
+    description: "Extra modules you can activate based on your current growth stage.",
     subscription: "Subscription",
     oneTime: "One-time",
     request: "Request add-on",
@@ -18,10 +18,10 @@ const copy = {
   },
   es: {
     eyebrow: "Add-ons",
-    title: "Módulos extra para aumentar el valor por proyecto",
-    description: "Combina add-ons one-time y suscripción según la etapa de crecimiento del cliente.",
-    subscription: "Suscripción",
-    oneTime: "Pago único",
+    title: "Add-ons de Crecimiento para Negocios Locales",
+    description: "Modulos extra que puedes activar segun la etapa de tu negocio.",
+    subscription: "Suscripcion",
+    oneTime: "Pago unico",
     request: "Solicitar add-on",
     month: "/ mes"
   }
@@ -41,7 +41,7 @@ export default async function AddonsPage() {
             <CardHeader>
               <CardTitle>{addon.name}</CardTitle>
               <p className="text-lg font-bold">
-                ${addon.priceMin} - ${addon.priceMax}
+                ${addon.priceMin}
                 {addon.billingType === "subscription" ? ` ${c.month}` : ""}
               </p>
               <Badge variant={addon.billingType === "subscription" ? "warning" : "secondary"}>

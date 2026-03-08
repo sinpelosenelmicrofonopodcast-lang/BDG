@@ -1,6 +1,6 @@
 import Link from "next/link";
 import { Check } from "lucide-react";
-import { projectPlans, retainerPlans } from "@/lib/constants";
+import { projectPlans } from "@/lib/constants";
 import type { Locale } from "@/lib/i18n/config";
 import { currency } from "@/lib/utils";
 import { Badge } from "@/components/ui/badge";
@@ -9,101 +9,155 @@ import { Card, CardContent, CardFooter, CardHeader, CardTitle } from "@/componen
 
 const planCopy = {
   en: {
-    headerRetainers: "Retainers",
     quoteCta: "Get Quote",
-    requestQuoteOnly: "Request quote",
     mostSold: "Most Sold",
+    setup: "Setup",
     month: "/ month",
+    includes: "Includes",
+    perfectFor: "Perfect for",
     descriptions: {
-      "starter-landing": "Ideal to launch fast and start selling from one conversion page.",
-      "business-website": "Professional website for companies ready to scale client acquisition.",
-      "small-business-quote": "Flexible small-business plan, quoted based on real scope and priorities.",
-      "growth-system": "Conversion system with automations and operational visibility.",
-      "app-platform": "Digital product with login, roles, payments and integrations.",
-      enterprise: "Enterprise architecture and roadmap tailored to your operation.",
-      "care-plan": "Monthly technical maintenance and monitoring.",
-      "seo-growth": "Organic growth retainer focused on lead generation.",
-      "automation-crm": "Automate sales follow-up and pipeline execution."
+      "starter-local": "Professional online presence for local businesses.",
+      "business-local": "System to receive and manage clients automatically.",
+      "pro-local": "Automated growth system with full operational visibility.",
+      "realtors-dealers": "Special plan for real estate and automotive listings."
     },
     features: {
-      "starter-landing": ["1 page", "WhatsApp", "Lead form", "Basic SEO", "Responsive", "Basic tracking"],
-      "business-website": ["5-8 pages", "Technical SEO", "Performance", "Optional blog", "Analytics"],
-      "small-business-quote": ["Scope by need", "Phased roadmap", "Conversion-first approach", "Modular execution"],
-      "growth-system": ["Premium website", "Booking", "Simple CRM", "Automations", "Basic dashboard"],
-      "app-platform": ["Login", "Roles", "Admin dashboard", "Payments", "Integrations"],
-      enterprise: ["Custom quote", "Dedicated architecture", "Priority support"],
-      "care-plan": ["Maintenance", "Backups", "Monthly support"],
-      "seo-growth": ["Technical SEO", "Content", "Monthly report"],
-      "automation-crm": ["CRM", "Automations", "Funnel optimization"]
-    }
+      "starter-local": [
+        "Mobile-optimized professional page",
+        "Business info (services, menu or products)",
+        "Direct call or WhatsApp button",
+        "Google Maps integration",
+        "Social media integration",
+        "Secure hosting",
+        "Basic maintenance",
+        "Basic push notifications"
+      ],
+      "business-local": [
+        "Everything in Starter",
+        "Orders or booking system",
+        "Automatic customer confirmation",
+        "Basic admin panel",
+        "Automatic push notifications",
+        "Email notifications",
+        "Basic local SEO",
+        "Social media integration"
+      ],
+      "pro-local": [
+        "Everything in Business",
+        "Full client dashboard",
+        "Orders or booking control",
+        "Client database",
+        "Automated promotions",
+        "Business analytics",
+        "Promo landing pages",
+        "Advanced notification system"
+      ],
+      "realtors-dealers": [
+        "Professional website",
+        "Property or car listings",
+        "Lead forms",
+        "New client notifications",
+        "Listings management panel",
+        "Social media integration"
+      ]
+    },
+    perfectForList: {
+      "starter-local": ["Food trucks", "Barbers", "Salons", "Small businesses"],
+      "business-local": ["Restaurants", "Travel agencies", "Salons", "Barbers", "Local services"],
+      "pro-local": ["Large restaurants", "Dealers", "Travel agencies", "Realtors", "Growing businesses"],
+      "realtors-dealers": ["Realtors", "Dealers"]
+    },
+    noteTitle: "Included in every plan",
+    noteLineOne: "Hosting, maintenance and technical support are included in all plans.",
+    noteLineTwo: "All systems are mobile-optimized and designed to help local businesses get more clients."
   },
   es: {
-    headerRetainers: "Retainers",
-    quoteCta: "Cotizar",
-    requestQuoteOnly: "Solicitar quote",
-    mostSold: "Más vendido",
+    quoteCta: "Solicitar quote",
+    mostSold: "Mas vendido",
+    setup: "Setup",
     month: "/ mes",
+    includes: "Incluye",
+    perfectFor: "Perfecto para",
     descriptions: {
-      "starter-landing": "Ideal para lanzar rápido y vender desde una sola página.",
-      "business-website": "Sitio profesional para empresas que quieren escalar clientes.",
-      "small-business-quote": "Plan flexible para pequeños negocios, cotizado según necesidad real.",
-      "growth-system": "Sistema de conversión con automatizaciones y control comercial.",
-      "app-platform": "Producto digital con login, roles, pagos e integraciones.",
-      enterprise: "Arquitectura enterprise y roadmap a medida.",
-      "care-plan": "Mantenimiento técnico mensual y monitoreo.",
-      "seo-growth": "Retainer de crecimiento orgánico orientado a leads.",
-      "automation-crm": "Automatiza ventas, seguimiento y pipeline."
+      "starter-local": "Presencia profesional online para negocios locales.",
+      "business-local": "Sistema para recibir y administrar clientes automaticamente.",
+      "pro-local": "Sistema de crecimiento automatizado con visibilidad completa.",
+      "realtors-dealers": "Plan especial para listados de realtors y dealers."
     },
     features: {
-      "starter-landing": ["1 página", "WhatsApp", "Formulario", "SEO básico", "Responsive", "Tracking básico"],
-      "business-website": ["5-8 páginas", "SEO técnico", "Performance", "Blog opcional", "Analytics"],
-      "small-business-quote": ["Scope por necesidad", "Roadmap por fases", "Prioridad a conversión", "Implementación modular"],
-      "growth-system": ["Web premium", "Booking", "CRM simple", "Automations", "Dashboard básico"],
-      "app-platform": ["Login", "Roles", "Dashboard admin", "Pagos", "Integraciones"],
-      enterprise: ["Cotización personalizada", "Arquitectura dedicada", "Soporte prioritario"],
-      "care-plan": ["Mantenimiento", "Backups", "Soporte mensual"],
-      "seo-growth": ["SEO técnico", "Contenido", "Reporte mensual"],
-      "automation-crm": ["CRM", "Automations", "Optimización funnel"]
-    }
+      "starter-local": [
+        "Pagina profesional optimizada para celular",
+        "Informacion del negocio (servicios, menu o productos)",
+        "Boton de llamada o WhatsApp directo",
+        "Google Maps integrado",
+        "Integracion con redes sociales",
+        "Hosting seguro",
+        "Mantenimiento basico",
+        "Notificaciones push basicas"
+      ],
+      "business-local": [
+        "Todo lo incluido en Starter",
+        "Sistema de ordenes o reservas",
+        "Confirmacion automatica al cliente",
+        "Panel basico para administrar",
+        "Notificaciones push automaticas",
+        "Notificaciones por email",
+        "SEO local basico",
+        "Integracion con redes sociales"
+      ],
+      "pro-local": [
+        "Todo lo incluido en Business",
+        "Dashboard completo de clientes",
+        "Control de ordenes o reservas",
+        "Base de datos de clientes",
+        "Promociones automaticas",
+        "Analytics del negocio",
+        "Landing pages para promociones",
+        "Sistema de notificaciones avanzado"
+      ],
+      "realtors-dealers": [
+        "Pagina profesional",
+        "Listados de propiedades o autos",
+        "Formularios para leads",
+        "Notificaciones de nuevos clientes",
+        "Panel para administrar listings",
+        "Integracion con redes sociales"
+      ]
+    },
+    perfectForList: {
+      "starter-local": ["Food trucks", "Barberos", "Esteticas", "Pequenos negocios"],
+      "business-local": ["Restaurantes", "Agencias de viajes", "Esteticas", "Barberos", "Servicios locales"],
+      "pro-local": ["Restaurantes grandes", "Dealers", "Agencias de viajes", "Realtors", "Negocios en crecimiento"],
+      "realtors-dealers": ["Realtors", "Dealers"]
+    },
+    noteTitle: "Incluido en todos los planes",
+    noteLineOne: "Hosting, mantenimiento y soporte tecnico incluidos en todos los planes.",
+    noteLineTwo: "Los sistemas estan optimizados para celulares y disenados para ayudar a negocios locales a recibir mas clientes."
   }
 } as const;
 
-function renderPrice(min: number, max: number, suffix?: string) {
-  if (max <= min) {
-    return `${currency(min)}${suffix ? ` ${suffix}` : ""}`;
-  }
-
-  return `${currency(min)} - ${currency(max)}${suffix ? ` ${suffix}` : ""}`;
-}
-
-function shouldHidePrice(priceMin: number, priceMax: number, billingType: string) {
-  if (billingType === "quote_only") {
-    return true;
-  }
-
-  return priceMin >= 5000 || priceMax >= 5000;
-}
-
-export function PricingCards({ locale }: { locale: Locale }) {
+export function PricingCards({ locale, showBottomNote = false }: { locale: Locale; showBottomNote?: boolean }) {
   const c = planCopy[locale];
 
   return (
-    <div className="space-y-10">
-      <div className="grid gap-5 md:grid-cols-2 lg:grid-cols-3">
-        {projectPlans.map((plan) => {
-          const quoteOnly = shouldHidePrice(plan.priceMin, plan.priceMax, plan.billingType);
-
-          return (
-            <Card key={plan.slug} className="relative overflow-hidden">
-              {plan.popular ? <Badge className="absolute right-4 top-4">{c.mostSold}</Badge> : null}
-              <CardHeader>
-                <CardTitle>{plan.name}</CardTitle>
-                <p className="text-2xl font-bold">
-                  {quoteOnly ? c.requestQuoteOnly : renderPrice(plan.priceMin, plan.priceMax)}
-                </p>
-                <p className="text-sm text-muted-foreground">{c.descriptions[plan.slug]}</p>
-              </CardHeader>
-              <CardContent>
+    <div className="space-y-8">
+      <div className="grid gap-5 md:grid-cols-2 lg:grid-cols-4">
+        {projectPlans.map((plan) => (
+          <Card key={plan.slug} className="relative overflow-hidden">
+            {plan.popular ? <Badge className="absolute right-4 top-4">{c.mostSold}</Badge> : null}
+            <CardHeader>
+              <CardTitle>{plan.name}</CardTitle>
+              <p className="text-sm font-semibold text-primary">
+                {c.setup}: {currency(plan.setupFee)}
+              </p>
+              <p className="text-3xl font-bold">
+                {currency(plan.priceMin)} {c.month}
+              </p>
+              <p className="text-sm text-muted-foreground">{c.descriptions[plan.slug]}</p>
+            </CardHeader>
+            <CardContent className="space-y-4">
+              <div>
+                <p className="mb-2 text-xs font-semibold uppercase tracking-wide text-muted-foreground">{c.includes}</p>
                 <ul className="space-y-2 text-sm">
                   {c.features[plan.slug].map((feature) => (
                     <li key={feature} className="flex items-center gap-2">
@@ -112,41 +166,32 @@ export function PricingCards({ locale }: { locale: Locale }) {
                     </li>
                   ))}
                 </ul>
-              </CardContent>
-              <CardFooter className="flex gap-2">
-                <Button asChild className="w-full">
-                  <Link href="/contact">{c.quoteCta}</Link>
-                </Button>
-              </CardFooter>
-            </Card>
-          );
-        })}
+              </div>
+              <div>
+                <p className="mb-2 text-xs font-semibold uppercase tracking-wide text-muted-foreground">{c.perfectFor}</p>
+                <p className="text-sm text-muted-foreground">{c.perfectForList[plan.slug].join(" • ")}</p>
+              </div>
+            </CardContent>
+            <CardFooter>
+              <Button asChild className="w-full">
+                <Link href="/contact">{c.quoteCta}</Link>
+              </Button>
+            </CardFooter>
+          </Card>
+        ))}
       </div>
 
-      <div>
-        <h3 className="mb-4 font-heading text-2xl font-bold">{c.headerRetainers}</h3>
-        <div className="grid gap-5 md:grid-cols-3">
-          {retainerPlans.map((plan) => (
-            <Card key={plan.slug}>
-              <CardHeader>
-                <CardTitle>{plan.name}</CardTitle>
-                <p className="text-xl font-bold">{renderPrice(plan.priceMin, plan.priceMax, c.month)}</p>
-                <p className="text-sm text-muted-foreground">{c.descriptions[plan.slug]}</p>
-              </CardHeader>
-              <CardContent>
-                <ul className="space-y-2 text-sm">
-                  {c.features[plan.slug].map((feature) => (
-                    <li key={feature} className="flex items-center gap-2">
-                      <Check className="h-4 w-4 text-primary" />
-                      <span>{feature}</span>
-                    </li>
-                  ))}
-                </ul>
-              </CardContent>
-            </Card>
-          ))}
-        </div>
-      </div>
+      {showBottomNote ? (
+        <Card className="border-primary/30 bg-primary/5">
+          <CardHeader>
+            <CardTitle className="text-lg">{c.noteTitle}</CardTitle>
+          </CardHeader>
+          <CardContent className="space-y-1 text-sm text-muted-foreground">
+            <p>{c.noteLineOne}</p>
+            <p>{c.noteLineTwo}</p>
+          </CardContent>
+        </Card>
+      ) : null}
     </div>
   );
 }
