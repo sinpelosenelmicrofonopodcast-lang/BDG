@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { Manrope, Space_Grotesk } from "next/font/google";
 import "./globals.css";
 import { SiteHeader } from "@/components/layout/site-header";
 import { SiteFooter } from "@/components/layout/site-footer";
@@ -8,6 +9,20 @@ import { AnalyticsProvider } from "@/components/analytics/analytics-provider";
 import { LanguageProvider } from "@/components/i18n/language-provider";
 import { getServerLocale } from "@/lib/i18n/server";
 import { getCurrentUserRole } from "@/lib/auth";
+
+const bodyFont = Manrope({
+  subsets: ["latin"],
+  variable: "--font-body",
+  display: "swap",
+  weight: ["400", "500", "600", "700", "800"]
+});
+
+const headingFont = Space_Grotesk({
+  subsets: ["latin"],
+  variable: "--font-heading",
+  display: "swap",
+  weight: ["500", "600", "700"]
+});
 
 export const metadata: Metadata = {
   metadataBase: new URL(process.env.NEXT_PUBLIC_APP_URL ?? "http://localhost:3000"),
@@ -47,7 +62,7 @@ export default async function RootLayout({ children }: Readonly<{ children: Reac
 
   return (
     <html lang={locale}>
-      <body className="font-body">
+      <body className={`${bodyFont.variable} ${headingFont.variable} font-body bg-background text-foreground`}>
         <LanguageProvider initialLocale={locale}>
           <AnalyticsProvider />
           <SiteHeader isAdmin={isAdmin} />

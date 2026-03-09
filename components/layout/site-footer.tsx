@@ -31,12 +31,12 @@ const copy = {
     caseStudies: "Casos",
     blog: "Blog",
     contact: "Contacto",
-    terms: "Términos",
+    terms: "Terminos",
     privacy: "Privacidad",
-    billing: "Política de pagos",
+    billing: "Politica de pagos",
     webDev: "Desarrollo Web",
     appPlatforms: "Plataformas App",
-    automation: "Automatización CRM",
+    automation: "Automatizacion CRM",
     seo: "Retainers SEO"
   }
 } as const;
@@ -46,10 +46,10 @@ export function SiteFooter() {
   const c = copy[locale];
 
   return (
-    <footer className="mt-20 border-t border-border/70 bg-card/50">
+    <footer className="mt-20 border-t border-border bg-background/80 backdrop-blur">
       <div className="container-shell grid gap-10 py-12 md:grid-cols-4">
         <div className="space-y-3">
-          <Image src="/logo.png" alt="BDG" width={156} height={56} className="h-10 w-auto rounded-sm border border-border/50" />
+          <Image src="/logo.png" alt="BDG" width={156} height={56} className="h-10 w-auto rounded-md border border-border bg-background p-1" />
           <p className="text-sm text-muted-foreground">{c.description}</p>
         </div>
         <div>
@@ -84,7 +84,7 @@ export function SiteFooter() {
           </ul>
         </div>
       </div>
-      <div className="container-shell border-t border-border/60 py-4 text-xs text-muted-foreground">
+      <div className="container-shell border-t border-border py-4 text-xs text-muted-foreground">
         Copyright {new Date().getFullYear()} BDG. {c.copyright}
       </div>
     </footer>

@@ -131,7 +131,7 @@ export default async function HomePage() {
     <div className="pb-20">
       <section className="container-shell grid gap-10 py-16 lg:grid-cols-[1.1fr_0.9fr] lg:py-24">
         <div className="space-y-6">
-          <p className="inline-flex items-center rounded-full bg-primary/15 px-4 py-2 text-xs font-semibold uppercase tracking-[0.16em] text-primary">
+          <p className="inline-flex items-center rounded-full bg-foreground px-4 py-2 text-xs font-semibold uppercase tracking-[0.16em] text-background">
             {c.badge}
           </p>
           <h1 className="font-heading text-4xl font-extrabold tracking-tight sm:text-5xl lg:text-6xl">{c.title}</h1>
@@ -151,7 +151,7 @@ export default async function HomePage() {
           </div>
         </div>
 
-        <Card className="border-primary/30 bg-gradient-to-br from-primary/10 via-card to-accent/60">
+        <Card className="border-border bg-gradient-to-br from-card via-card to-secondary/80">
           <CardHeader>
             <CardTitle className="text-3xl">{c.resultsTitle}</CardTitle>
           </CardHeader>
@@ -221,7 +221,7 @@ export default async function HomePage() {
         <SectionTitle eyebrow={c.portfolioEyebrow} title={c.portfolioTitle} className="mb-7" />
         <div className="grid gap-5 md:grid-cols-3">
           {portfolio.map((item) => (
-            <Card key={item} className="bg-gradient-to-br from-secondary/70 to-card">
+            <Card key={item} className="bg-gradient-to-br from-card to-secondary/80">
               <CardHeader>
                 <CardTitle className="text-xl">{item}</CardTitle>
               </CardHeader>
@@ -245,7 +245,7 @@ export default async function HomePage() {
       </section>
 
       <section className="container-shell py-10">
-        <Card className="border-primary/50 bg-gradient-to-r from-primary/10 via-card to-accent/70">
+        <Card className="border-border bg-gradient-to-r from-secondary/70 via-card to-secondary/40">
           <CardContent className="flex flex-col items-start justify-between gap-5 py-8 md:flex-row md:items-center">
             <div className="space-y-2">
               <p className="text-sm font-semibold uppercase tracking-wider text-primary">{c.ctaEyebrow}</p>

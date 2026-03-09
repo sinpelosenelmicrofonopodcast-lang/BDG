@@ -34,8 +34,8 @@ const config: Config = {
         sm: "calc(var(--radius) - 4px)"
       },
       fontFamily: {
-        heading: ["Space Grotesk", "sans-serif"],
-        body: ["Manrope", "sans-serif"]
+        heading: ["var(--font-heading)", "ui-sans-serif", "system-ui", "sans-serif"],
+        body: ["var(--font-body)", "ui-sans-serif", "system-ui", "sans-serif"]
       },
       keyframes: {
         "fade-in": {

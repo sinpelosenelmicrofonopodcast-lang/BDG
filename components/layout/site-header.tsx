@@ -36,7 +36,7 @@ const navLabels = {
     getQuote: "Cotizar",
     adminDashboard: "Panel Admin",
     adminShort: "Admin",
-    constructionBanner: "En construcción. Pronto vienen mejoras para ustedes."
+    constructionBanner: "En construccion. Pronto vienen mejoras para ustedes."
   }
 } as const;
 
@@ -56,14 +56,14 @@ export function SiteHeader({ isAdmin = false }: SiteHeaderProps) {
   ];
 
   return (
-    <header className="sticky top-0 z-50 border-b border-border/80 bg-background/90 backdrop-blur">
-      <div className="border-b border-primary/20 bg-primary/10 px-4 py-2 text-center text-xs font-semibold tracking-wide text-primary">
+    <header className="sticky top-0 z-50 border-b border-border/80 bg-background/95 backdrop-blur">
+      <div className="border-b border-border bg-secondary/70 px-4 py-2 text-center text-[11px] font-semibold uppercase tracking-[0.14em] text-foreground/90">
         {c.constructionBanner}
       </div>
 
-      <div className="container-shell flex h-16 items-center justify-between gap-4">
+      <div className="container-shell flex h-[72px] items-center justify-between gap-4">
         <Link href={isAdmin ? adminHref : "/"} className="inline-flex items-center gap-3">
-          <Image src="/logo.png" alt="BDG" width={132} height={44} priority className="h-9 w-auto rounded-sm border border-border/50" />
+          <Image src="/logo.png" alt="BDG" width={132} height={44} priority className="h-9 w-auto rounded-md border border-border bg-background p-1" />
         </Link>
 
         <nav className="hidden items-center gap-6 md:flex">
@@ -72,7 +72,7 @@ export function SiteHeader({ isAdmin = false }: SiteHeaderProps) {
               key={link.href}
               href={link.href}
               className={cn(
-                "text-sm font-medium text-muted-foreground hover:text-foreground",
+                "text-sm font-semibold text-muted-foreground hover:text-foreground",
                 pathname === link.href && "text-foreground"
               )}
             >
