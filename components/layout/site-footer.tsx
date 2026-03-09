@@ -14,6 +14,7 @@ const copy = {
     caseStudies: "Case Studies",
     blog: "Blog",
     contact: "Contact",
+    clientPortal: "Client Portal",
     terms: "Terms",
     privacy: "Privacy",
     billing: "Billing Policy",
@@ -31,6 +32,7 @@ const copy = {
     caseStudies: "Casos",
     blog: "Blog",
     contact: "Contacto",
+    clientPortal: "Portal Cliente",
     terms: "Terminos",
     privacy: "Privacidad",
     billing: "Politica de pagos",
@@ -72,6 +74,9 @@ export function SiteFooter() {
             </li>
             <li>
               <Link href="/contact">{c.contact}</Link>
+            </li>
+            <li>
+              <Link href="/client-portal">{c.clientPortal}</Link>
             </li>
           </ul>
         </div>

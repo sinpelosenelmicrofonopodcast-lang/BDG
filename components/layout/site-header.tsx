@@ -22,6 +22,7 @@ const navLabels = {
     contact: "Contact",
     namePlan: "Name Your Plan",
     getQuote: "Get Quote",
+    clientPortal: "Client Portal",
     adminDashboard: "Admin Dashboard",
     adminShort: "Admin",
     constructionBanner: "Under construction. Better improvements for you are coming soon."
@@ -34,6 +35,7 @@ const navLabels = {
     contact: "Contacto",
     namePlan: "Nombra tu plan",
     getQuote: "Cotizar",
+    clientPortal: "Portal Cliente",
     adminDashboard: "Panel Admin",
     adminShort: "Admin",
     constructionBanner: "En construccion. Pronto vienen mejoras para ustedes."
@@ -83,6 +85,9 @@ export function SiteHeader({ isAdmin = false }: SiteHeaderProps) {
 
         <div className="hidden items-center gap-3 md:flex">
           <LanguageToggle />
+          <Button asChild variant="outline" size="sm">
+            <Link href="/client-portal">{c.clientPortal}</Link>
+          </Button>
           {isAdmin ? (
             <Button asChild variant="outline" size="sm">
               <Link href={adminHref}>{c.adminDashboard}</Link>
@@ -98,6 +103,9 @@ export function SiteHeader({ isAdmin = false }: SiteHeaderProps) {
 
         <div className="flex items-center gap-2 md:hidden">
           <LanguageToggle />
+          <Button asChild variant="outline" size="sm">
+            <Link href="/client-portal">{c.clientPortal}</Link>
+          </Button>
           {isAdmin ? (
             <Button asChild variant="outline" size="sm">
               <Link href={adminHref}>{c.adminShort}</Link>
