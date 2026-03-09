@@ -9,8 +9,10 @@ import { LanguageToggle } from "@/components/layout/language-toggle";
 import { useLanguage } from "@/components/i18n/language-provider";
 import { cn } from "@/lib/utils";
 
+type ViewerRole = "guest" | "client" | "admin";
+
 type SiteHeaderProps = {
-  isAdmin?: boolean;
+  viewerRole?: ViewerRole;
 };
 
 const navLabels = {
@@ -23,8 +25,7 @@ const navLabels = {
     namePlan: "Name Your Plan",
     getQuote: "Get Quote",
     clientPortal: "Client Portal",
-    adminDashboard: "Admin Dashboard",
-    adminShort: "Admin",
+    adminPortal: "Admin Portal",
     constructionBanner: "Under construction. Better improvements for you are coming soon."
   },
   es: {
@@ -36,20 +37,25 @@ const navLabels = {
     namePlan: "Nombra tu plan",
     getQuote: "Cotizar",
     clientPortal: "Portal Cliente",
-    adminDashboard: "Panel Admin",
-    adminShort: "Admin",
+    adminPortal: "Portal Admin",
     constructionBanner: "En construccion. Pronto vienen mejoras para ustedes."
   }
 } as const;
 
-export function SiteHeader({ isAdmin = false }: SiteHeaderProps) {
+export function SiteHeader({ viewerRole = "guest" }: SiteHeaderProps) {
   const pathname = usePathname();
   const { locale } = useLanguage();
   const c = navLabels[locale];
+
   const adminHref = "/dashboard/admin/overview";
+  const clientHref = "/dashboard/client";
+  const guestPortalHref = "/client-portal";
+
+  const portalHref = viewerRole === "admin" ? adminHref : viewerRole === "client" ? clientHref : guestPortalHref;
+  const portalLabel = viewerRole === "admin" ? c.adminPortal : c.clientPortal;
+  const homeHref = viewerRole === "admin" ? adminHref : "/";
 
   const links = [
-    ...(isAdmin ? [{ href: adminHref, label: c.adminDashboard }] : []),
     { href: "/pricing", label: c.pricing },
     { href: "/addons", label: c.addons },
     { href: "/case-studies", label: c.caseStudies },
@@ -64,7 +70,7 @@ export function SiteHeader({ isAdmin = false }: SiteHeaderProps) {
       </div>
 
       <div className="container-shell flex h-[72px] items-center justify-between gap-4">
-        <Link href={isAdmin ? adminHref : "/"} className="inline-flex items-center gap-3">
+        <Link href={homeHref} className="inline-flex items-center gap-3">
           <Image src="/logo.png" alt="BDG" width={132} height={44} priority className="h-9 w-auto rounded-md border border-border bg-background p-1" />
         </Link>
 
@@ -86,13 +92,8 @@ export function SiteHeader({ isAdmin = false }: SiteHeaderProps) {
         <div className="hidden items-center gap-3 md:flex">
           <LanguageToggle />
           <Button asChild variant="outline" size="sm">
-            <Link href="/client-portal">{c.clientPortal}</Link>
+            <Link href={portalHref}>{portalLabel}</Link>
           </Button>
-          {isAdmin ? (
-            <Button asChild variant="outline" size="sm">
-              <Link href={adminHref}>{c.adminDashboard}</Link>
-            </Button>
-          ) : null}
           <Button asChild variant="ghost" size="sm">
             <Link href="/name-your-plan">{c.namePlan}</Link>
           </Button>
@@ -104,13 +105,8 @@ export function SiteHeader({ isAdmin = false }: SiteHeaderProps) {
         <div className="flex items-center gap-2 md:hidden">
           <LanguageToggle />
           <Button asChild variant="outline" size="sm">
-            <Link href="/client-portal">{c.clientPortal}</Link>
+            <Link href={portalHref}>{portalLabel}</Link>
           </Button>
-          {isAdmin ? (
-            <Button asChild variant="outline" size="sm">
-              <Link href={adminHref}>{c.adminShort}</Link>
-            </Button>
-          ) : null}
         </div>
 
         <Button variant="ghost" size="icon" className="md:hidden" aria-label="Open menu">

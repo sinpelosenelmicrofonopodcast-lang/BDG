@@ -48,15 +48,17 @@ export const metadata: Metadata = {
 export default async function RootLayout({ children }: Readonly<{ children: React.ReactNode }>) {
   const locale = await getServerLocale();
 
-  let isAdmin = false;
+  let viewerRole: "guest" | "client" | "admin" = "guest";
   const hasSupabaseConfig = Boolean(process.env.NEXT_PUBLIC_SUPABASE_URL && process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY);
 
   if (hasSupabaseConfig) {
     try {
       const role = await getCurrentUserRole();
-      isAdmin = role === "admin";
+      if (role === "admin" || role === "client") {
+        viewerRole = role;
+      }
     } catch {
-      isAdmin = false;
+      viewerRole = "guest";
     }
   }
 
@@ -65,7 +67,7 @@ export default async function RootLayout({ children }: Readonly<{ children: Reac
       <body className={`${bodyFont.variable} ${headingFont.variable} font-body bg-background text-foreground`}>
         <LanguageProvider initialLocale={locale}>
           <AnalyticsProvider />
-          <SiteHeader isAdmin={isAdmin} />
+          <SiteHeader viewerRole={viewerRole} />
           <main>{children}</main>
           <SiteFooter />
           <StickyMobileCta />
