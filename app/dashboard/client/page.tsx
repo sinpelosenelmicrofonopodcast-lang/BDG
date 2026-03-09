@@ -9,6 +9,7 @@ import { MessageForm } from "@/components/dashboard/message-form";
 import { AddonRequestForm } from "@/components/dashboard/addon-request-form";
 import { AssetUploadForm } from "@/components/dashboard/asset-upload-form";
 import { BillingPortalButton } from "@/components/dashboard/billing-portal-button";
+import { ClientTestimonialForm } from "@/components/dashboard/client-testimonial-form";
 
 const copy = {
   en: {
@@ -16,20 +17,25 @@ const copy = {
     openTickets: "Open tickets",
     pendingAddons: "Pending add-ons",
     uploadedFiles: "Uploaded files",
-    planStatus: "Plan and project status",
+    planStatus: "Plan and service status",
     noProjects: "No active projects yet.",
     expires: "Expires",
     due: "Due",
     tbd: "TBD",
     price: "Price",
-    quotesInvoices: "Quotes and invoices",
-    noQuotes: "No quotes linked to your account yet.",
-    quote: "Quote",
+    nextBilling: "Next billing",
+    service: "Service",
+    billing: "Billing",
+    payments: "Payments",
+    noPayments: "No payment records yet.",
+    amount: "Amount",
     status: "Status",
-    total: "Total",
-    deposit: "Deposit",
-    paymentAvailable: "Payment available",
-    awaitingAcceptance: "Awaiting acceptance",
+    websites: "Websites",
+    noWebsites: "No websites linked yet.",
+    addOns: "Active add-ons",
+    noAddOns: "No active add-ons yet.",
+    internalUpdates: "Internal updates",
+    noUpdates: "No updates yet.",
     recentTickets: "Recent tickets",
     recentMessages: "Recent messages"
   },
@@ -38,20 +44,25 @@ const copy = {
     openTickets: "Tickets abiertos",
     pendingAddons: "Add-ons pendientes",
     uploadedFiles: "Archivos subidos",
-    planStatus: "Estado de plan y proyecto",
-    noProjects: "No hay proyectos activos todavía.",
+    planStatus: "Estado de plan y servicio",
+    noProjects: "No hay proyectos activos todavia.",
     expires: "Expira",
     due: "Entrega",
     tbd: "Por definir",
     price: "Precio",
-    quotesInvoices: "Cotizaciones y facturas",
-    noQuotes: "No hay cotizaciones vinculadas a tu cuenta.",
-    quote: "Cotización",
+    nextBilling: "Proximo cobro",
+    service: "Servicio",
+    billing: "Cobro",
+    payments: "Pagos",
+    noPayments: "Sin registros de pago.",
+    amount: "Monto",
     status: "Estado",
-    total: "Total",
-    deposit: "Depósito",
-    paymentAvailable: "Pago disponible",
-    awaitingAcceptance: "Pendiente de aceptación",
+    websites: "Websites",
+    noWebsites: "No hay websites vinculados.",
+    addOns: "Add-ons activos",
+    noAddOns: "Sin add-ons activos.",
+    internalUpdates: "Actualizaciones internas",
+    noUpdates: "Sin actualizaciones.",
     recentTickets: "Tickets recientes",
     recentMessages: "Mensajes recientes"
   }
@@ -63,23 +74,66 @@ export default async function ClientDashboardPage() {
   const c = copy[locale];
   const supabase = await getSupabaseServerClient();
 
-  const [{ data: projects }, { data: tickets }, { data: messages }, { data: quoteList }, { data: addonRequests }, { data: files }, { data: addons }] =
-    await Promise.all([
-      supabase.from("projects").select("id,name,status,due_date,expiration_date,total_price,timeline").eq("client_id", user.id).order("created_at", { ascending: false }),
-      supabase.from("tickets").select("id,subject,status,type,created_at").eq("client_id", user.id).order("created_at", { ascending: false }).limit(10),
-      supabase
-        .from("messages")
-        .select("id,body,created_at,is_admin_message")
-        .or(`sender_id.eq.${user.id},recipient_id.eq.${user.id}`)
-        .order("created_at", { ascending: false })
-        .limit(10),
-      supabase.from("quotes").select("id,status,total,deposit_required,payment_unlocked,created_at").eq("client_id", user.id).order("created_at", { ascending: false }),
-      supabase.from("addon_requests").select("id,status,created_at,addon_id").eq("client_id", user.id).order("created_at", { ascending: false }).limit(10),
-      supabase.from("files").select("id,path,created_at,project_id").eq("owner_id", user.id).order("created_at", { ascending: false }).limit(10),
-      supabase.from("addons").select("id,name").eq("active", true)
-    ]);
+  const [
+    { data: profile },
+    { data: projects },
+    { data: tickets },
+    { data: messages },
+    { data: addonRequests },
+    { data: files },
+    { data: addons },
+    { data: entitlements },
+    { data: websites },
+    { data: billingEvents },
+    { data: internalNotes },
+    { data: alerts }
+  ] = await Promise.all([
+    supabase.from("profiles").select("full_name").eq("id", user.id).maybeSingle(),
+    supabase
+      .from("projects")
+      .select("id,name,status,service_status,billing_status,due_date,expiration_date,next_billing_date,total_price")
+      .eq("client_id", user.id)
+      .order("created_at", { ascending: false }),
+    supabase.from("tickets").select("id,subject,status,type,created_at").eq("client_id", user.id).order("created_at", { ascending: false }).limit(10),
+    supabase
+      .from("messages")
+      .select("id,body,created_at,is_admin_message")
+      .or(`sender_id.eq.${user.id},recipient_id.eq.${user.id}`)
+      .order("created_at", { ascending: false })
+      .limit(10),
+    supabase.from("addon_requests").select("id,status,created_at,addon_id").eq("client_id", user.id).order("created_at", { ascending: false }).limit(10),
+    supabase.from("files").select("id,path,created_at,project_id").eq("owner_id", user.id).order("created_at", { ascending: false }).limit(10),
+    supabase.from("addons").select("id,name").eq("active", true),
+    supabase.from("entitlements").select("id,status,type,starts_at,expires_at,addon_id,project_id").order("created_at", { ascending: false }).limit(100),
+    supabase
+      .from("project_websites")
+      .select("id,label,domain,status,website_url,ssl_expires_at,last_checked_at,project_id")
+      .eq("client_id", user.id)
+      .order("created_at", { ascending: false }),
+    supabase
+      .from("billing_events")
+      .select("id,status,amount,currency,due_date,paid_at,created_at")
+      .eq("client_id", user.id)
+      .order("created_at", { ascending: false })
+      .limit(20),
+    supabase
+      .from("internal_notes")
+      .select("id,note,visibility,created_at")
+      .eq("client_id", user.id)
+      .order("created_at", { ascending: false })
+      .limit(10),
+    supabase
+      .from("admin_alerts")
+      .select("id,title,message,severity,status,created_at")
+      .eq("client_id", user.id)
+      .eq("visible_to_client", true)
+      .eq("status", "open")
+      .order("created_at", { ascending: false })
+      .limit(10)
+  ]);
 
   const projectOptions = (projects ?? []).map((project) => ({ id: project.id, name: project.name }));
+  const addonMap = new Map((addons ?? []).map((addon) => [addon.id, addon.name]));
 
   return (
     <div className="space-y-6">
@@ -129,12 +183,14 @@ export default async function ClientDashboardPage() {
               <div key={project.id} className="rounded-md border border-border p-3">
                 <p className="font-semibold">{project.name}</p>
                 <div className="mt-2 flex flex-wrap gap-2">
-                  <Badge variant="secondary">{project.status}</Badge>
+                  <Badge variant={project.service_status === "active" ? "success" : "warning"}>{c.service}: {project.service_status ?? project.status}</Badge>
+                  <Badge variant={project.billing_status === "current" ? "secondary" : "warning"}>{c.billing}: {project.billing_status ?? "current"}</Badge>
                   {project.expiration_date ? <Badge variant="warning">{c.expires} {formatDate(project.expiration_date)}</Badge> : null}
                 </div>
                 <p className="mt-2 text-xs text-muted-foreground">
-                  {c.due}: {project.due_date ? formatDate(project.due_date) : c.tbd} | {c.price}: ${project.total_price ?? 0}
+                  {c.due}: {project.due_date ? formatDate(project.due_date) : c.tbd} | {c.nextBilling}: {project.next_billing_date ? formatDate(project.next_billing_date) : c.tbd}
                 </p>
+                <p className="text-xs text-muted-foreground">{c.price}: ${project.total_price ?? 0}</p>
               </div>
             ))}
           </CardContent>
@@ -142,30 +198,85 @@ export default async function ClientDashboardPage() {
 
         <Card>
           <CardHeader>
-            <CardTitle>{c.quotesInvoices}</CardTitle>
+            <CardTitle>{c.payments}</CardTitle>
           </CardHeader>
           <CardContent className="space-y-3 text-sm">
-            {(quoteList ?? []).length === 0 ? <p className="text-muted-foreground">{c.noQuotes}</p> : null}
-            {(quoteList ?? []).map((quote) => (
-              <div key={quote.id} className="rounded-md border border-border p-3">
+            {(billingEvents ?? []).length === 0 ? <p className="text-muted-foreground">{c.noPayments}</p> : null}
+            {(billingEvents ?? []).map((payment) => (
+              <div key={payment.id} className="rounded-md border border-border p-3">
                 <p className="font-semibold">
-                  {c.quote} #{quote.id.slice(0, 8)}
+                  {c.amount}: ${Number(payment.amount).toFixed(0)} {payment.currency}
                 </p>
                 <p className="text-xs text-muted-foreground">
-                  {c.status}: {quote.status}
+                  {c.status}: {payment.status} • {payment.due_date ? formatDate(payment.due_date) : formatDate(payment.created_at)}
                 </p>
-                <p className="text-xs text-muted-foreground">
-                  {c.total}: ${Number(quote.total).toFixed(0)}
-                </p>
-                <p className="text-xs text-muted-foreground">
-                  {c.deposit}: ${Number(quote.deposit_required).toFixed(0)}
-                </p>
-                {quote.payment_unlocked ? <Badge variant="success">{c.paymentAvailable}</Badge> : <Badge variant="outline">{c.awaitingAcceptance}</Badge>}
               </div>
             ))}
             <BillingPortalButton />
           </CardContent>
         </Card>
+      </div>
+
+      <div className="grid gap-4 lg:grid-cols-2">
+        <Card>
+          <CardHeader>
+            <CardTitle>{c.websites}</CardTitle>
+          </CardHeader>
+          <CardContent className="space-y-2 text-sm">
+            {(websites ?? []).map((website) => (
+              <div key={website.id} className="rounded-md border border-border p-3">
+                <p className="font-semibold">{website.label} • {website.domain}</p>
+                <p className="text-xs text-muted-foreground">{website.website_url ?? "-"}</p>
+                <Badge variant={website.status === "active" ? "success" : "warning"}>{website.status}</Badge>
+              </div>
+            ))}
+            {(websites ?? []).length === 0 ? <p className="text-muted-foreground">{c.noWebsites}</p> : null}
+          </CardContent>
+        </Card>
+
+        <Card>
+          <CardHeader>
+            <CardTitle>{c.addOns}</CardTitle>
+          </CardHeader>
+          <CardContent className="space-y-2 text-sm">
+            {(entitlements ?? []).map((item) => (
+              <div key={item.id} className="rounded-md border border-border p-3">
+                <p className="font-semibold">{addonMap.get(item.addon_id ?? "") ?? item.addon_id ?? "Add-on"}</p>
+                <p className="text-xs text-muted-foreground">
+                  {item.type} • {item.status} • {formatDate(item.starts_at)}
+                  {item.expires_at ? ` → ${formatDate(item.expires_at)}` : ""}
+                </p>
+              </div>
+            ))}
+            {(entitlements ?? []).length === 0 ? <p className="text-muted-foreground">{c.noAddOns}</p> : null}
+          </CardContent>
+        </Card>
+      </div>
+
+      <div className="grid gap-4 lg:grid-cols-2">
+        <Card>
+          <CardHeader>
+            <CardTitle>{c.internalUpdates}</CardTitle>
+          </CardHeader>
+          <CardContent className="space-y-2 text-sm">
+            {(alerts ?? []).map((alert) => (
+              <div key={alert.id} className="rounded-md border border-border p-3">
+                <p className="font-semibold">{alert.title}</p>
+                {alert.message ? <p>{alert.message}</p> : null}
+                <p className="text-xs text-muted-foreground">{alert.severity} • {formatDate(alert.created_at)}</p>
+              </div>
+            ))}
+            {(internalNotes ?? []).map((note) => (
+              <div key={note.id} className="rounded-md border border-border p-3">
+                <p>{note.note}</p>
+                <p className="text-xs text-muted-foreground">{note.visibility} • {formatDate(note.created_at)}</p>
+              </div>
+            ))}
+            {(alerts ?? []).length === 0 && (internalNotes ?? []).length === 0 ? <p className="text-muted-foreground">{c.noUpdates}</p> : null}
+          </CardContent>
+        </Card>
+
+        <ClientTestimonialForm locale={locale} defaultFullName={profile?.full_name} />
       </div>
 
       <div className="grid gap-4 lg:grid-cols-2">

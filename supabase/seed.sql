@@ -8,7 +8,7 @@ values
     29,
     29,
     'Presencia profesional online para negocios locales.',
-    '["Pagina profesional optimizada para celular","Informacion del negocio","Boton de llamada o WhatsApp","Google Maps integrado","Integracion con redes sociales","Hosting seguro","Mantenimiento basico","Notificaciones push basicas"]'::jsonb,
+    '["Pagina profesional optimizada para celular","Informacion del negocio","Boton de llamada o contacto directo","Google Maps integrado","Integracion con redes sociales","Hosting seguro","Mantenimiento basico","Notificaciones push basicas"]'::jsonb,
     false,
     true
   ),
@@ -108,3 +108,13 @@ where slug in (
   'pwa-app',
   'hosting-managed'
 );
+
+insert into public.site_settings (key, value)
+values (
+  'contact_settings',
+  '{"method":"form","value":"","labelEn":"Contact Us","labelEs":"Contactanos","openInNewTab":false,"agencyEmail":"sales@youragency.com","agencyPhone":"+1-000-000-0000","locationEn":"United States","locationEs":"Estados Unidos"}'::jsonb
+)
+on conflict (key) do update
+set
+  value = excluded.value,
+  updated_at = now();

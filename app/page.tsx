@@ -18,6 +18,7 @@ import {
   Zap
 } from "lucide-react";
 import { getServerLocale } from "@/lib/i18n/server";
+import { getContactSettings, resolveContactCta } from "@/lib/site-settings";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -35,11 +36,11 @@ const copy = {
       "Get more calls, reservations, orders and leads with a system designed for restaurants, food trucks, barbers, salons, realtors and local service businesses.",
     ctaPrimary: "See Pricing",
     ctaSecondary: "Name Your Plan",
-    ctaWhatsApp: "WhatsApp",
+    ctaContact: "Contact",
     heroCardTitle: "What you launch first",
     heroCardItems: [
       "Mobile-first pages that load fast",
-      "WhatsApp/call CTA in every key section",
+      "Direct contact CTA in every key section",
       "Lead capture, booking or order flow",
       "Simple dashboard to track activity"
     ],
@@ -70,7 +71,7 @@ const copy = {
     finalTitle: "If you want more clients this month, this is your next step",
     finalSubtitle: "Choose a plan or tell us your budget. We will map the fastest path to launch.",
     finalPrimary: "Start now",
-    finalSecondary: "Talk on WhatsApp"
+    finalSecondary: "Contact us"
   },
   es: {
     heroBadge: "Hecho para negocios locales",
@@ -79,11 +80,11 @@ const copy = {
       "Recibe mas llamadas, reservas, pedidos y leads con un sistema pensado para restaurantes, food trucks, barberos, esteticas, realtors y servicios locales.",
     ctaPrimary: "Ver pricing",
     ctaSecondary: "Nombra tu plan",
-    ctaWhatsApp: "WhatsApp",
+    ctaContact: "Contacto",
     heroCardTitle: "Lo que lanzas primero",
     heroCardItems: [
       "Paginas mobile-first con carga rapida",
-      "CTA de WhatsApp/llamada en puntos clave",
+      "CTA de contacto/llamada en puntos clave",
       "Flujo de leads, reservas o pedidos",
       "Dashboard simple para ver actividad"
     ],
@@ -114,7 +115,7 @@ const copy = {
     finalTitle: "Si quieres mas clientes este mes, este es el siguiente paso",
     finalSubtitle: "Elige un plan o dinos tu presupuesto. Te mostramos la ruta mas rapida para lanzar.",
     finalPrimary: "Comenzar ahora",
-    finalSecondary: "Hablar por WhatsApp"
+    finalSecondary: "Contactarnos"
   }
 } as const;
 
@@ -161,7 +162,7 @@ const benefitsByLocale = {
   en: [
     {
       title: "More local leads",
-      body: "Capture calls, WhatsApp chats and form leads from every key page.",
+      body: "Capture calls, contact form leads and booking requests from every key page.",
       icon: MapPin
     },
     {
@@ -183,7 +184,7 @@ const benefitsByLocale = {
   es: [
     {
       title: "Mas leads locales",
-      body: "Captura llamadas, chats de WhatsApp y formularios desde cada pagina clave.",
+      body: "Captura llamadas, formularios y solicitudes de reserva desde cada pagina clave.",
       icon: MapPin
     },
     {
@@ -230,7 +231,7 @@ const useCasesByLocale = {
     {
       title: "Food Trucks",
       body: "Share location, menu and daily demand in minutes.",
-      points: ["Mobile-first page", "WhatsApp orders", "Location updates"],
+      points: ["Mobile-first page", "Direct orders", "Location updates"],
       icon: Truck
     },
     {
@@ -262,7 +263,7 @@ const useCasesByLocale = {
     {
       title: "Food Trucks",
       body: "Publica ubicacion, menu y demanda diaria en minutos.",
-      points: ["Pagina mobile-first", "Pedidos por WhatsApp", "Actualizacion de ubicacion"],
+      points: ["Pagina mobile-first", "Pedidos directos", "Actualizacion de ubicacion"],
       icon: Truck
     },
     {
@@ -288,7 +289,7 @@ const useCasesByLocale = {
 
 const integrationsByLocale = {
   en: [
-    { label: "WhatsApp", icon: MessageCircle },
+    { label: "Direct messaging", icon: MessageCircle },
     { label: "Google Maps", icon: MapPin },
     { label: "Instagram", icon: Instagram },
     { label: "Email notifications", icon: Mail },
@@ -296,7 +297,7 @@ const integrationsByLocale = {
     { label: "Analytics", icon: BarChart3 }
   ],
   es: [
-    { label: "WhatsApp", icon: MessageCircle },
+    { label: "Mensajeria directa", icon: MessageCircle },
     { label: "Google Maps", icon: MapPin },
     { label: "Instagram", icon: Instagram },
     { label: "Notificaciones por email", icon: Mail },
@@ -309,17 +310,18 @@ const trustStatsByLocale = {
   en: [
     { label: "Launch speed", value: "7-21 days", icon: Rocket },
     { label: "Admin complexity", value: "Simple", icon: ShieldCheck },
-    { label: "Lead channels", value: "Calls + WhatsApp + Forms", icon: MessageCircle }
+    { label: "Lead channels", value: "Calls + Forms + Booking", icon: MessageCircle }
   ],
   es: [
     { label: "Velocidad de lanzamiento", value: "7-21 dias", icon: Rocket },
     { label: "Complejidad de admin", value: "Simple", icon: ShieldCheck },
-    { label: "Canales de leads", value: "Llamadas + WhatsApp + Formularios", icon: MessageCircle }
+    { label: "Canales de leads", value: "Llamadas + Formularios + Reservas", icon: MessageCircle }
   ]
 } as const;
 
 export default async function HomePage() {
-  const locale = await getServerLocale();
+  const [locale, contactSettings] = await Promise.all([getServerLocale(), getContactSettings()]);
+  const contactCta = resolveContactCta(contactSettings, locale);
   const c = copy[locale];
   const problems = problemsByLocale[locale];
   const benefits = benefitsByLocale[locale];
@@ -344,9 +346,13 @@ export default async function HomePage() {
               <Link href="/name-your-plan">{c.ctaSecondary}</Link>
             </Button>
             <Button asChild size="lg" variant="outline">
-              <a href={process.env.NEXT_PUBLIC_AGENCY_WHATSAPP ?? "https://wa.me/10000000000"} target="_blank" rel="noreferrer">
-                {c.ctaWhatsApp}
-              </a>
+              {contactCta.isExternal ? (
+                <a href={contactCta.href} target={contactCta.target} rel={contactCta.rel}>
+                  {contactCta.label}
+                </a>
+              ) : (
+                <Link href={contactCta.href}>{contactCta.label}</Link>
+              )}
             </Button>
           </div>
 
@@ -507,9 +513,13 @@ export default async function HomePage() {
                 <Link href="/contact">{c.finalPrimary}</Link>
               </Button>
               <Button asChild variant="outline">
-                <a href={process.env.NEXT_PUBLIC_AGENCY_WHATSAPP ?? "https://wa.me/10000000000"} target="_blank" rel="noreferrer">
-                  {c.finalSecondary}
-                </a>
+                {contactCta.isExternal ? (
+                  <a href={contactCta.href} target={contactCta.target} rel={contactCta.rel}>
+                    {contactCta.label}
+                  </a>
+                ) : (
+                  <Link href={contactCta.href}>{contactCta.label}</Link>
+                )}
               </Button>
             </div>
           </CardContent>

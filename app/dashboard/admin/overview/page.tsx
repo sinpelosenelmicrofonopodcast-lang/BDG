@@ -10,6 +10,9 @@ const copy = {
     projects: "Projects",
     openTickets: "Open tickets",
     pendingQuotes: "Pending quotes",
+    pastDueProjects: "Past due projects",
+    suspendedProjects: "Suspended projects",
+    openAlerts: "Open alerts",
     expirations: "Upcoming expirations",
     recentTickets: "Recent tickets"
   },
@@ -18,7 +21,10 @@ const copy = {
     projects: "Proyectos",
     openTickets: "Tickets abiertos",
     pendingQuotes: "Cotizaciones pendientes",
-    expirations: "Próximas expiraciones",
+    pastDueProjects: "Proyectos vencidos",
+    suspendedProjects: "Proyectos suspendidos",
+    openAlerts: "Alertas abiertas",
+    expirations: "Proximas expiraciones",
     recentTickets: "Tickets recientes"
   }
 } as const;
@@ -28,24 +34,36 @@ export default async function AdminOverviewPage() {
   const c = copy[locale];
   const supabase = await getSupabaseServerClient();
 
-  const [{ count: clientsCount }, { count: projectsCount }, { count: openTickets }, { count: pendingQuotes }, { data: expirations }, { data: recentTickets }] =
-    await Promise.all([
-      supabase.from("profiles").select("id", { count: "exact", head: true }),
-      supabase.from("projects").select("id", { count: "exact", head: true }),
-      supabase.from("tickets").select("id", { count: "exact", head: true }).in("status", ["open", "in_progress"]),
-      supabase.from("quotes").select("id", { count: "exact", head: true }).in("status", ["draft", "sent"]),
-      supabase
-        .from("projects")
-        .select("id,name,expiration_date")
-        .not("expiration_date", "is", null)
-        .order("expiration_date", { ascending: true })
-        .limit(8),
-      supabase.from("tickets").select("id,subject,status,type,created_at").order("created_at", { ascending: false }).limit(8)
-    ]);
+  const [
+    { count: clientsCount },
+    { count: projectsCount },
+    { count: openTickets },
+    { count: pendingQuotes },
+    { count: pastDueProjects },
+    { count: suspendedProjects },
+    { count: openAlerts },
+    { data: expirations },
+    { data: recentTickets }
+  ] = await Promise.all([
+    supabase.from("profiles").select("id", { count: "exact", head: true }),
+    supabase.from("projects").select("id", { count: "exact", head: true }),
+    supabase.from("tickets").select("id", { count: "exact", head: true }).in("status", ["open", "in_progress"]),
+    supabase.from("quotes").select("id", { count: "exact", head: true }).in("status", ["draft", "sent"]),
+    supabase.from("projects").select("id", { count: "exact", head: true }).in("billing_status", ["past_due", "unpaid"]),
+    supabase.from("projects").select("id", { count: "exact", head: true }).eq("service_status", "suspended"),
+    supabase.from("admin_alerts").select("id", { count: "exact", head: true }).eq("status", "open"),
+    supabase
+      .from("projects")
+      .select("id,name,expiration_date,service_status,billing_status")
+      .not("expiration_date", "is", null)
+      .order("expiration_date", { ascending: true })
+      .limit(10),
+    supabase.from("tickets").select("id,subject,status,type,created_at").order("created_at", { ascending: false }).limit(10)
+  ]);
 
   return (
     <div className="space-y-6">
-      <div className="grid gap-4 md:grid-cols-4">
+      <div className="grid gap-4 md:grid-cols-4 xl:grid-cols-7">
         <Card>
           <CardHeader>
             <CardTitle className="text-lg">{c.clients}</CardTitle>
@@ -78,6 +96,30 @@ export default async function AdminOverviewPage() {
             <p className="text-3xl font-bold">{pendingQuotes ?? 0}</p>
           </CardContent>
         </Card>
+        <Card>
+          <CardHeader>
+            <CardTitle className="text-lg">{c.pastDueProjects}</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <p className="text-3xl font-bold">{pastDueProjects ?? 0}</p>
+          </CardContent>
+        </Card>
+        <Card>
+          <CardHeader>
+            <CardTitle className="text-lg">{c.suspendedProjects}</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <p className="text-3xl font-bold">{suspendedProjects ?? 0}</p>
+          </CardContent>
+        </Card>
+        <Card>
+          <CardHeader>
+            <CardTitle className="text-lg">{c.openAlerts}</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <p className="text-3xl font-bold">{openAlerts ?? 0}</p>
+          </CardContent>
+        </Card>
       </div>
 
       <div className="grid gap-4 lg:grid-cols-2">
@@ -87,8 +129,13 @@ export default async function AdminOverviewPage() {
           </CardHeader>
           <CardContent className="space-y-2">
             {(expirations ?? []).map((project) => (
-              <div key={project.id} className="flex items-center justify-between rounded-md border border-border p-3 text-sm">
-                <span className="font-medium">{project.name}</span>
+              <div key={project.id} className="flex items-center justify-between gap-3 rounded-md border border-border p-3 text-sm">
+                <div>
+                  <p className="font-medium">{project.name}</p>
+                  <p className="text-xs text-muted-foreground">
+                    {project.service_status} • {project.billing_status}
+                  </p>
+                </div>
                 <Badge variant="warning">{project.expiration_date ? formatDate(project.expiration_date) : "N/A"}</Badge>
               </div>
             ))}

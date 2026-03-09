@@ -2,6 +2,7 @@ import { getServerLocale } from "@/lib/i18n/server";
 import { getSupabaseServerClient } from "@/lib/supabase/server";
 import { formatDate } from "@/lib/utils";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { AdminTicketStatusActions } from "@/components/dashboard/admin-ticket-status-actions";
 
 const labels = {
   en: {
@@ -30,7 +31,11 @@ export default async function AdminTicketsPage() {
   ] as const;
 
   const supabase = await getSupabaseServerClient();
-  const { data: tickets } = await supabase.from("tickets").select("id,subject,type,priority,status,created_at").order("created_at", { ascending: false }).limit(120);
+  const { data: tickets } = await supabase
+    .from("tickets")
+    .select("id,subject,type,priority,status,created_at")
+    .order("created_at", { ascending: false })
+    .limit(150);
 
   return (
     <div className="grid gap-4 lg:grid-cols-4">
@@ -49,6 +54,13 @@ export default async function AdminTicketsPage() {
                     {ticket.type} • {ticket.priority}
                   </p>
                   <p className="text-xs text-muted-foreground">{formatDate(ticket.created_at)}</p>
+
+                  <AdminTicketStatusActions
+                    ticketId={ticket.id}
+                    locale={locale}
+                    initialStatus={ticket.status}
+                    initialPriority={ticket.priority}
+                  />
                 </div>
               ))}
           </CardContent>

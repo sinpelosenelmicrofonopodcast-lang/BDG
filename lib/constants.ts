@@ -11,7 +11,7 @@ export const projectPlans = [
     features: [
       "Pagina profesional optimizada para celular",
       "Informacion del negocio (servicios, menu o productos)",
-      "Boton de llamada o WhatsApp directo",
+      "Boton de llamada o contacto directo",
       "Google Maps integrado",
       "Integracion con redes sociales",
       "Hosting seguro",
@@ -105,7 +105,6 @@ export const analyticsEvents = {
   VIEW_PRICING: "view_pricing",
   START_NAME_YOUR_PLAN: "start_name_your_plan",
   SUBMIT_NAME_YOUR_PLAN: "submit_name_your_plan",
-  CLICK_WHATSAPP: "click_whatsapp",
   START_CHECKOUT: "start_checkout",
   PURCHASE_COMPLETED: "purchase_completed",
   OPEN_TICKET: "open_ticket",

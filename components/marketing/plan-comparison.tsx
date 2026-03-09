@@ -17,7 +17,7 @@ const copy = {
       "realtors-dealers": "Realtors and dealers managing dynamic listings."
     },
     includes: {
-      "starter-local": "Mobile page • WhatsApp/call • Maps • Hosting",
+      "starter-local": "Mobile page • Contact/call • Maps • Hosting",
       "business-local": "Starter + bookings/orders • Admin panel • Local SEO",
       "pro-local": "Business + dashboard • Database • Analytics • Promotions",
       "realtors-dealers": "Listings • Lead forms • Notifications • Listings panel"
@@ -39,7 +39,7 @@ const copy = {
       "realtors-dealers": "Realtors y dealers con operacion de listings activa."
     },
     includes: {
-      "starter-local": "Pagina movil • WhatsApp/llamada • Maps • Hosting",
+      "starter-local": "Pagina movil • Contacto/llamada • Maps • Hosting",
       "business-local": "Starter + reservas/ordenes • Panel admin • SEO local",
       "pro-local": "Business + dashboard • Base de datos • Analytics • Promociones",
       "realtors-dealers": "Listings • Formularios lead • Notificaciones • Panel listings"

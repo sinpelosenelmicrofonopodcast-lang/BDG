@@ -5,7 +5,6 @@ import "./globals.css";
 import { SiteHeader } from "@/components/layout/site-header";
 import { SiteFooter } from "@/components/layout/site-footer";
 import { StickyMobileCta } from "@/components/layout/sticky-mobile-cta";
-import { WhatsAppButton } from "@/components/layout/whatsapp-button";
 import { AnalyticsProvider } from "@/components/analytics/analytics-provider";
 import { LanguageProvider } from "@/components/i18n/language-provider";
 import { getServerLocale } from "@/lib/i18n/server";
@@ -70,7 +69,6 @@ export default async function RootLayout({ children }: Readonly<{ children: Reac
           <main>{children}</main>
           <SiteFooter />
           <StickyMobileCta />
-          <WhatsAppButton />
         </LanguageProvider>
 
         <Script id="tawk-to" strategy="afterInteractive">

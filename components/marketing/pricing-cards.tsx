@@ -25,7 +25,7 @@ const planCopy = {
       "starter-local": [
         "Mobile-optimized professional page",
         "Business info (services, menu or products)",
-        "Direct call or WhatsApp button",
+        "Direct call or contact button",
         "Google Maps integration",
         "Social media integration",
         "Secure hosting",
@@ -88,7 +88,7 @@ const planCopy = {
       "starter-local": [
         "Pagina profesional optimizada para celular",
         "Informacion del negocio (servicios, menu o productos)",
-        "Boton de llamada o WhatsApp directo",
+        "Boton de llamada o contacto directo",
         "Google Maps integrado",
         "Integracion con redes sociales",
         "Hosting seguro",

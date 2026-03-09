@@ -1,11 +1,14 @@
 import { getServerLocale } from "@/lib/i18n/server";
+import { getContactSettings } from "@/lib/site-settings";
+import { ContactSettingsForm } from "@/components/dashboard/contact-settings-form";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 
 export default async function AdminSettingsPage() {
   const locale = await getServerLocale();
-  const title = locale === "es" ? "Configuración de entorno y negocio" : "Environment and business settings";
+  const title = locale === "es" ? "Configuracion de entorno y negocio" : "Environment and business settings";
   const configured = locale === "es" ? "Configurado" : "Configured";
   const missing = locale === "es" ? "Falta" : "Missing";
+  const contactSettings = await getContactSettings();
 
   const checks = [
     { label: "Supabase URL", ok: Boolean(process.env.NEXT_PUBLIC_SUPABASE_URL) },
@@ -18,18 +21,22 @@ export default async function AdminSettingsPage() {
   ];
 
   return (
-    <Card>
-      <CardHeader>
-        <CardTitle>{title}</CardTitle>
-      </CardHeader>
-      <CardContent className="space-y-2 text-sm">
-        {checks.map((item) => (
-          <div key={item.label} className="flex items-center justify-between rounded-md border border-border p-3">
-            <span>{item.label}</span>
-            <span className={item.ok ? "text-emerald-600" : "text-destructive"}>{item.ok ? configured : missing}</span>
-          </div>
-        ))}
-      </CardContent>
-    </Card>
+    <div className="space-y-6">
+      <Card>
+        <CardHeader>
+          <CardTitle>{title}</CardTitle>
+        </CardHeader>
+        <CardContent className="space-y-2 text-sm">
+          {checks.map((item) => (
+            <div key={item.label} className="flex items-center justify-between rounded-md border border-border p-3">
+              <span>{item.label}</span>
+              <span className={item.ok ? "text-emerald-600" : "text-destructive"}>{item.ok ? configured : missing}</span>
+            </div>
+          ))}
+        </CardContent>
+      </Card>
+
+      <ContactSettingsForm locale={locale} initialValues={contactSettings} />
+    </div>
   );
 }
