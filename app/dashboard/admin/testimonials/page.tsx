@@ -1,13 +1,18 @@
 import { TestimonialForm } from "@/components/dashboard/testimonial-form";
 import { AdminTestimonialActions } from "@/components/dashboard/admin-testimonial-actions";
+import { DashboardPageHeader } from "@/components/dashboard/page-header";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Badge } from "@/components/ui/badge";
+import { EmptyState } from "@/components/ui/empty-state";
 import { getServerLocale } from "@/lib/i18n/server";
 import { getSupabaseServerClient } from "@/lib/supabase/server";
 import { formatDate } from "@/lib/utils";
 
 const copy = {
   en: {
+    eyebrow: "Social proof",
     title: "Testimonials",
+    description: "Review incoming testimonials, decide what becomes public and highlight the strongest proof.",
     recent: "Recent testimonials",
     pending: "Pending approval",
     status: "Status",
@@ -16,10 +21,13 @@ const copy = {
     inactive: "Inactive",
     yes: "Yes",
     no: "No",
-    empty: "No testimonials yet."
+    empty: "No testimonials yet.",
+    emptyBody: "New client feedback will appear here once submitted."
   },
   es: {
+    eyebrow: "Prueba social",
     title: "Testimonios",
+    description: "Revisa testimonios entrantes, decide cuales se publican y destaca la mejor prueba social.",
     recent: "Testimonios recientes",
     pending: "Pendientes de aprobacion",
     status: "Estado",
@@ -28,7 +36,8 @@ const copy = {
     inactive: "Inactivo",
     yes: "Si",
     no: "No",
-    empty: "Aun no hay testimonios."
+    empty: "Aun no hay testimonios.",
+    emptyBody: "Los nuevos testimonios enviados por clientes apareceran aqui."
   }
 } as const;
 
@@ -62,6 +71,8 @@ export default async function AdminTestimonialsPage() {
 
   return (
     <div className="space-y-6">
+      <DashboardPageHeader eyebrow={c.eyebrow} title={c.title} description={c.description} />
+
       <TestimonialForm />
 
       <Card>
@@ -69,19 +80,24 @@ export default async function AdminTestimonialsPage() {
           <CardTitle>{c.pending}</CardTitle>
         </CardHeader>
         <CardContent className="space-y-3">
+          {pendingRows.length === 0 ? <EmptyState title={c.empty} description={c.emptyBody} compact /> : null}
           {pendingRows.map((row) => {
             const quote = locale === "es" ? (row.quote_es ?? row.quote_en) : (row.quote_en ?? row.quote_es);
             return (
-              <div key={row.id} className="rounded-md border border-border p-3">
-                <p className="font-medium">{row.full_name}</p>
-                <p className="text-xs text-muted-foreground">{row.company_name ?? row.company_role ?? "-"}</p>
-                <p className="mt-2 text-sm">{quote ? `\"${quote}\"` : "-"}</p>
-                <p className="mt-2 text-xs text-muted-foreground">{formatDate(row.created_at)}</p>
+              <div key={row.id} className="rounded-xl border border-border p-4">
+                <div className="flex flex-wrap items-start justify-between gap-3">
+                  <div>
+                    <p className="font-medium">{row.full_name}</p>
+                    <p className="text-xs text-muted-foreground">{row.company_name ?? row.company_role ?? "-"}</p>
+                  </div>
+                  <Badge variant="warning">{c.inactive}</Badge>
+                </div>
+                <p className="mt-3 text-sm leading-6">{quote ? `\"${quote}\"` : "-"}</p>
+                <p className="mt-3 text-xs text-muted-foreground">{formatDate(row.created_at)}</p>
                 <AdminTestimonialActions testimonialId={row.id} locale={locale} initialActive={row.active} initialFeatured={row.is_featured} />
               </div>
             );
           })}
-          {pendingRows.length === 0 ? <p className="text-sm text-muted-foreground">{c.empty}</p> : null}
         </CardContent>
       </Card>
 
@@ -90,13 +106,22 @@ export default async function AdminTestimonialsPage() {
           <CardTitle>{c.recent}</CardTitle>
         </CardHeader>
         <CardContent className="space-y-3">
+          {rows.length === 0 ? <EmptyState title={c.empty} description={c.emptyBody} compact /> : null}
           {rows.map((row) => {
             const quote = locale === "es" ? (row.quote_es ?? row.quote_en) : (row.quote_en ?? row.quote_es);
             return (
-              <div key={row.id} className="rounded-md border border-border p-3">
-                <p className="font-medium">{row.full_name}</p>
-                <p className="text-xs text-muted-foreground">{row.company_name ?? row.company_role ?? "-"}</p>
-                <p className="mt-2 text-sm">{quote ? `\"${quote}\"` : "-"}</p>
+              <div key={row.id} className="rounded-xl border border-border p-4">
+                <div className="flex flex-wrap items-start justify-between gap-3">
+                  <div>
+                    <p className="font-medium">{row.full_name}</p>
+                    <p className="text-xs text-muted-foreground">{row.company_name ?? row.company_role ?? "-"}</p>
+                  </div>
+                  <div className="flex flex-wrap gap-2">
+                    <Badge variant={row.active ? "success" : "secondary"}>{row.active ? c.active : c.inactive}</Badge>
+                    {row.is_featured ? <Badge variant="secondary">{c.featured}</Badge> : null}
+                  </div>
+                </div>
+                <p className="mt-3 text-sm leading-6">{quote ? `\"${quote}\"` : "-"}</p>
                 <p className="mt-2 text-xs text-muted-foreground">
                   {c.status}: {row.active ? c.active : c.inactive} • {c.featured}: {row.is_featured ? c.yes : c.no} • {formatDate(row.created_at)}
                 </p>
@@ -104,7 +129,6 @@ export default async function AdminTestimonialsPage() {
               </div>
             );
           })}
-          {rows.length === 0 ? <p className="text-sm text-muted-foreground">{c.empty}</p> : null}
         </CardContent>
       </Card>
     </div>

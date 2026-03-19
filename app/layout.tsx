@@ -26,22 +26,22 @@ const headingFont = Space_Grotesk({
 
 export const metadata: Metadata = {
   metadataBase: new URL(process.env.NEXT_PUBLIC_APP_URL ?? "http://localhost:3000"),
-  title: "BDG Agency SaaS Platform",
-  description: "Web and app systems for growth-focused businesses.",
+  title: "BDG Growth Platform",
+  description: "Growth systems for local businesses with automation, dashboards and client acquisition workflows.",
   icons: {
     icon: [{ url: "/icon.png", type: "image/png" }],
     apple: [{ url: "/apple-icon.png", type: "image/png" }]
   },
   openGraph: {
-    title: "BDG Agency SaaS Platform",
-    description: "Web and app systems for growth-focused businesses.",
-    images: [{ url: "/logo.png" }]
+    title: "BDG Growth Platform",
+    description: "Growth systems for local businesses with automation, dashboards and client acquisition workflows.",
+    images: [{ url: "/top-banner-apply.png" }]
   },
   twitter: {
     card: "summary_large_image",
-    title: "BDG Agency SaaS Platform",
-    description: "Web and app systems for growth-focused businesses.",
-    images: ["/logo.png"]
+    title: "BDG Growth Platform",
+    description: "Growth systems for local businesses with automation, dashboards and client acquisition workflows.",
+    images: ["/top-banner-apply.png"]
   }
 };
 

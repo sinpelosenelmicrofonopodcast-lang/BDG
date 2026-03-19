@@ -10,7 +10,7 @@ function drawLine(page: ReturnType<PDFDocument["addPage"]>, y: number) {
     start: { x: 50, y },
     end: { x: 545, y },
     thickness: 0.5,
-    color: rgb(0.72, 0.66, 0.45)
+    color: rgb(0.78, 0.78, 0.78)
   });
 }
 
@@ -60,7 +60,7 @@ export async function POST(_: Request, { params }: { params: Promise<{ id: strin
     page.drawImage(logoImage, { x: 50, y: 742, width: 170, height: 70 });
     y = 728;
   } catch {
-    page.drawText(process.env.AGENCY_NAME ?? "BDG", { x: 50, y, size: 20, font: fontBold, color: rgb(0.62, 0.47, 0.12) });
+    page.drawText(process.env.AGENCY_NAME ?? "BDG", { x: 50, y, size: 20, font: fontBold, color: rgb(0.14, 0.14, 0.14) });
     y -= 22;
   }
 
@@ -72,7 +72,7 @@ export async function POST(_: Request, { params }: { params: Promise<{ id: strin
   drawLine(page, y - 10);
   y -= 34;
 
-  page.drawText("Proposal", { x: 50, y, size: 18, font: fontBold, color: rgb(0.62, 0.47, 0.12) });
+  page.drawText("Proposal", { x: 50, y, size: 18, font: fontBold, color: rgb(0.14, 0.14, 0.14) });
   y -= 22;
   page.drawText(`Quote ID: ${quote.id}`, { x: 50, y, size: 10, font: fontRegular });
   y -= 20;
@@ -125,7 +125,7 @@ export async function POST(_: Request, { params }: { params: Promise<{ id: strin
     y,
     size: 11,
     font: fontBold,
-    color: rgb(0.62, 0.47, 0.12)
+    color: rgb(0.14, 0.14, 0.14)
   });
   y -= 26;
 
@@ -138,7 +138,7 @@ export async function POST(_: Request, { params }: { params: Promise<{ id: strin
   page.drawText("- Client approvals are required at each milestone.", { x: 50, y, size: 10, font: fontRegular });
   y -= 20;
 
-  page.drawText("CTA: Accept proposal and proceed to payment", { x: 50, y, size: 11, font: fontBold, color: rgb(0.42, 0.32, 0.1) });
+  page.drawText("CTA: Accept proposal and proceed to payment", { x: 50, y, size: 11, font: fontBold, color: rgb(0.14, 0.14, 0.14) });
 
   const pdfBytes = await pdfDoc.save();
   const filePath = `quotes/${quote.id}/proposal-${Date.now()}.pdf`;

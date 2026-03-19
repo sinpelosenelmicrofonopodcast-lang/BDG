@@ -111,7 +111,7 @@ export function QuoteAcceptanceCard({ quoteId, paymentUnlocked }: QuoteAcceptanc
         </form>
       ) : (
         <div className="space-y-3">
-          <p className="font-semibold text-emerald-700">{c.accepted}</p>
+          <p className="font-semibold text-status-success">{c.accepted}</p>
           <p className="text-sm text-muted-foreground">{c.nextStep}</p>
           <Button onClick={pay} disabled={loadingPayment}>
             {loadingPayment ? c.loadingCheckout : c.pay}

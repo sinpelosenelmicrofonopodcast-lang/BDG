@@ -136,7 +136,7 @@ export function TicketForm({ projects }: { projects: ProjectOption[] }) {
         {errors.description ? <p className="text-xs text-destructive">{errors.description.message}</p> : null}
       </div>
       <Button disabled={isSubmitting}>{isSubmitting ? c.creating : c.create}</Button>
-      {success ? <p className="text-xs text-emerald-600">{success}</p> : null}
+      {success ? <p className="text-xs text-status-success">{success}</p> : null}
     </form>
   );
 }

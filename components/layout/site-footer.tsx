@@ -3,10 +3,12 @@
 import Image from "next/image";
 import Link from "next/link";
 import { useLanguage } from "@/components/i18n/language-provider";
+import { Button } from "@/components/ui/button";
+import { Card, CardContent } from "@/components/ui/card";
 
 const copy = {
   en: {
-    description: "Web and app growth systems for service businesses.",
+    description: "Growth systems for local businesses that need more customers, more automation and clearer control.",
     services: "Services",
     company: "Company",
     legal: "Legal",
@@ -21,10 +23,14 @@ const copy = {
     webDev: "Web Development",
     appPlatforms: "App Platforms",
     automation: "Automation CRM",
-    seo: "SEO Retainers"
+    seo: "SEO Retainers",
+    footerCta:
+      "BDG helps local businesses grow with technology, automation and systems designed to attract more customers.",
+    footerPrimary: "Request Demo",
+    footerSecondary: "See Case Studies"
   },
   es: {
-    description: "Sistemas web y app para crecimiento de negocios de servicios.",
+    description: "Sistemas de crecimiento para negocios locales que necesitan mas clientes, mas automatizacion y mas control.",
     services: "Servicios",
     company: "Empresa",
     legal: "Legal",
@@ -39,7 +45,11 @@ const copy = {
     webDev: "Desarrollo Web",
     appPlatforms: "Plataformas App",
     automation: "Automatizacion CRM",
-    seo: "Retainers SEO"
+    seo: "Retainers SEO",
+    footerCta:
+      "BDG ayuda a negocios locales a crecer con tecnologia, automatizacion y sistemas disenados para atraer mas clientes.",
+    footerPrimary: "Solicitar Demo",
+    footerSecondary: "Ver Casos de Exito"
   }
 } as const;
 
@@ -49,9 +59,33 @@ export function SiteFooter() {
 
   return (
     <footer className="mt-20 border-t border-border bg-background/80 backdrop-blur">
+      <div className="container-shell pt-10">
+        <Card className="overflow-hidden border-border bg-[linear-gradient(135deg,rgba(15,23,42,0.98),rgba(18,42,97,0.94))] text-white">
+          <CardContent className="grid gap-6 px-6 py-8 md:px-8 md:py-9 lg:grid-cols-[1fr_auto] lg:items-center">
+            <p className="max-w-3xl text-base leading-7 text-white/82">{c.footerCta}</p>
+            <div className="flex flex-col gap-3 sm:flex-row">
+              <Button asChild className="bg-white text-slate-950 hover:bg-white/90">
+                <Link href="/contact">{c.footerPrimary}</Link>
+              </Button>
+              <Button asChild variant="outline" className="border-white/30 text-white hover:bg-white/10">
+                <Link href="/case-studies">{c.footerSecondary}</Link>
+              </Button>
+            </div>
+          </CardContent>
+        </Card>
+      </div>
+
       <div className="container-shell grid gap-10 py-12 md:grid-cols-4">
         <div className="space-y-3">
-          <Image src="/logo.png" alt="BDG" width={156} height={56} className="h-10 w-auto rounded-md border border-border bg-background p-1" />
+          <div className="inline-flex rounded-md bg-black px-3 py-2 shadow-sm">
+            <Image
+              src="/logo-footer.png"
+              alt="BDG"
+              width={156}
+              height={56}
+              className="h-10 w-auto sm:h-11"
+            />
+          </div>
           <p className="text-sm text-muted-foreground">{c.description}</p>
         </div>
         <div>

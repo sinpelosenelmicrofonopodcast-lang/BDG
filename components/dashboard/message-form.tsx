@@ -85,7 +85,7 @@ export function MessageForm({ projects }: { projects: ProjectOption[] }) {
         {errors.body ? <p className="text-xs text-destructive">{errors.body.message}</p> : null}
       </div>
       <Button disabled={isSubmitting}>{isSubmitting ? c.sending : c.send}</Button>
-      {success ? <p className="text-xs text-emerald-600">{success}</p> : null}
+      {success ? <p className="text-xs text-status-success">{success}</p> : null}
     </form>
   );
 }

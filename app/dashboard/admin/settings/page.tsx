@@ -30,7 +30,7 @@ export default async function AdminSettingsPage() {
           {checks.map((item) => (
             <div key={item.label} className="flex items-center justify-between rounded-md border border-border p-3">
               <span>{item.label}</span>
-              <span className={item.ok ? "text-emerald-600" : "text-destructive"}>{item.ok ? configured : missing}</span>
+              <span className={item.ok ? "text-status-success" : "text-destructive"}>{item.ok ? configured : missing}</span>
             </div>
           ))}
         </CardContent>

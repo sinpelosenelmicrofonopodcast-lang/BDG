@@ -192,7 +192,7 @@ export function TestimonialForm() {
 
           <Button disabled={isSubmitting}>{isSubmitting ? c.saving : c.save}</Button>
           {errorMessage ? <p className="text-sm text-destructive">{errorMessage}</p> : null}
-          {successMessage ? <p className="text-sm text-emerald-600">{successMessage}</p> : null}
+          {successMessage ? <p className="text-sm text-status-success">{successMessage}</p> : null}
         </form>
       </CardContent>
     </Card>

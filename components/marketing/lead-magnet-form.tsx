@@ -111,7 +111,7 @@ export function LeadMagnetForm() {
         {isSubmitting ? c.submitting : c.submit}
       </Button>
 
-      {successMessage ? <p className="text-sm text-emerald-600">{successMessage}</p> : null}
+      {successMessage ? <p className="text-sm text-status-success">{successMessage}</p> : null}
     </form>
   );
 }

@@ -3,75 +3,74 @@ export const projectPlans = [
     slug: "starter-local",
     name: "STARTER",
     setupFee: 199,
-    priceMin: 29,
-    priceMax: 29,
+    priceMin: 39,
+    priceMax: 39,
     billingType: "subscription",
     popular: false,
-    description: "Presencia profesional online para empezar con bajo costo mensual.",
+    description: "Sistema base para que tu negocio se vea profesional y empiece a captar clientes.",
     features: [
       "Pagina profesional optimizada para celular",
-      "Informacion del negocio (servicios, menu o productos)",
-      "Boton de llamada o contacto directo",
+      "Boton de llamada directa",
       "Google Maps integrado",
       "Integracion con redes sociales",
       "Hosting seguro",
-      "Mantenimiento basico",
-      "Notificaciones push basicas"
+      "Notificaciones basicas",
+      "Panel simple de contacto"
     ]
   },
   {
     slug: "business-local",
     name: "BUSINESS",
     setupFee: 399,
-    priceMin: 59,
-    priceMax: 59,
+    priceMin: 79,
+    priceMax: 79,
     billingType: "subscription",
-    popular: true,
-    description: "Sistema para recibir clientes con reservas u ordenes automatizadas.",
+    popular: false,
+    description: "Sistema automatico para recibir clientes, reservas y pedidos desde un solo flujo.",
     features: [
       "Todo lo incluido en Starter",
-      "Sistema de ordenes o reservas",
-      "Confirmacion automatica al cliente",
-      "Panel basico para administrar",
-      "Notificaciones push automaticas",
+      "Sistema de reservas o pedidos",
+      "Confirmaciones automaticas",
+      "Panel de administracion",
+      "Notificaciones push",
       "Notificaciones por email",
       "SEO local basico",
-      "Integracion con redes sociales"
+      "Integracion completa con redes"
     ]
   },
   {
     slug: "pro-local",
     name: "PRO",
     setupFee: 699,
-    priceMin: 99,
-    priceMax: 99,
+    priceMin: 129,
+    priceMax: 129,
     billingType: "subscription",
-    popular: false,
-    description: "Negocio automatizado con dashboard, analitica y flujos avanzados.",
+    popular: true,
+    description: "Sistema de crecimiento automatizado con dashboard, datos y campanas para escalar.",
     features: [
       "Todo lo incluido en Business",
       "Dashboard completo de clientes",
-      "Control de ordenes o reservas",
       "Base de datos de clientes",
+      "Control total de pedidos o reservas",
       "Promociones automaticas",
       "Analytics del negocio",
-      "Landing pages para promociones",
-      "Sistema de notificaciones avanzado"
+      "Landing pages promocionales",
+      "Sistema avanzado de notificaciones"
     ]
   },
   {
     slug: "realtors-dealers",
-    name: "REALTORS / DEALERS",
+    name: "LISTINGS",
     setupFee: 599,
-    priceMin: 79,
-    priceMax: 79,
+    priceMin: 99,
+    priceMax: 99,
     billingType: "subscription",
     popular: false,
-    description: "Plan especial para listings y generacion de leads en tiempo real.",
+    description: "Sistema para negocios que venden inventario o listados y necesitan captar leads rapido.",
     features: [
       "Pagina profesional",
-      "Listados de propiedades o autos",
-      "Formularios para leads",
+      "Listados de autos o propiedades",
+      "Formularios de leads",
       "Notificaciones de nuevos clientes",
       "Panel para administrar listings",
       "Integracion con redes sociales"
@@ -90,9 +89,9 @@ export const addonCatalog = [
     priceMax: 149,
     billingType: "subscription"
   },
+  { slug: "marketing-automation", name: "Automatizacion de marketing", priceMin: 59, priceMax: 59, billingType: "subscription" },
   { slug: "pro-photography", name: "Fotografia profesional", priceMin: 150, priceMax: 150, billingType: "one_time" },
-  { slug: "social-videos-reels", name: "Videos / Reels para redes", priceMin: 120, priceMax: 120, billingType: "one_time" },
-  { slug: "marketing-automation", name: "Automatizacion de marketing", priceMin: 59, priceMax: 59, billingType: "subscription" }
+  { slug: "social-videos-reels", name: "Videos / Reels para redes", priceMin: 120, priceMax: 120, billingType: "one_time" }
 ] as const;
 
 export const nameYourPlanOptions = {

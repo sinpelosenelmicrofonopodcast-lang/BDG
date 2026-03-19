@@ -1,11 +1,25 @@
+import {
+  AlertTriangle,
+  Clock3,
+  FileText,
+  FolderKanban,
+  Ticket,
+  Users
+} from "lucide-react";
 import { getServerLocale } from "@/lib/i18n/server";
 import { formatDate } from "@/lib/utils";
 import { getSupabaseServerClient } from "@/lib/supabase/server";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { DashboardPageHeader } from "@/components/dashboard/page-header";
+import { DashboardStatCard } from "@/components/dashboard/stat-card";
 import { Badge } from "@/components/ui/badge";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { EmptyState } from "@/components/ui/empty-state";
 
 const copy = {
   en: {
+    eyebrow: "Admin overview",
+    title: "Operational health snapshot",
+    description: "Quick visibility into client volume, delivery risk, unresolved support and pending sales work.",
     clients: "Clients",
     projects: "Projects",
     openTickets: "Open tickets",
@@ -14,9 +28,16 @@ const copy = {
     suspendedProjects: "Suspended projects",
     openAlerts: "Open alerts",
     expirations: "Upcoming expirations",
-    recentTickets: "Recent tickets"
+    recentTickets: "Recent tickets",
+    noExpirations: "No upcoming expirations.",
+    noExpirationsBody: "Projects with expiration windows will appear here when they get close.",
+    noTickets: "No recent tickets.",
+    noTicketsBody: "Support activity will appear here as soon as new tickets come in."
   },
   es: {
+    eyebrow: "Resumen admin",
+    title: "Snapshot de salud operativa",
+    description: "Visibilidad rapida sobre volumen de clientes, riesgo de entrega, soporte sin resolver y trabajo comercial pendiente.",
     clients: "Clientes",
     projects: "Proyectos",
     openTickets: "Tickets abiertos",
@@ -25,7 +46,11 @@ const copy = {
     suspendedProjects: "Proyectos suspendidos",
     openAlerts: "Alertas abiertas",
     expirations: "Proximas expiraciones",
-    recentTickets: "Tickets recientes"
+    recentTickets: "Tickets recientes",
+    noExpirations: "No hay expiraciones proximas.",
+    noExpirationsBody: "Los proyectos con fecha de expiracion apareceran aqui cuando esten cerca.",
+    noTickets: "No hay tickets recientes.",
+    noTicketsBody: "La actividad de soporte aparecera aqui cuando entren nuevos tickets."
   }
 } as const;
 
@@ -63,73 +88,27 @@ export default async function AdminOverviewPage() {
 
   return (
     <div className="space-y-6">
-      <div className="grid gap-4 md:grid-cols-4 xl:grid-cols-7">
-        <Card>
-          <CardHeader>
-            <CardTitle className="text-lg">{c.clients}</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <p className="text-3xl font-bold">{clientsCount ?? 0}</p>
-          </CardContent>
-        </Card>
-        <Card>
-          <CardHeader>
-            <CardTitle className="text-lg">{c.projects}</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <p className="text-3xl font-bold">{projectsCount ?? 0}</p>
-          </CardContent>
-        </Card>
-        <Card>
-          <CardHeader>
-            <CardTitle className="text-lg">{c.openTickets}</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <p className="text-3xl font-bold">{openTickets ?? 0}</p>
-          </CardContent>
-        </Card>
-        <Card>
-          <CardHeader>
-            <CardTitle className="text-lg">{c.pendingQuotes}</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <p className="text-3xl font-bold">{pendingQuotes ?? 0}</p>
-          </CardContent>
-        </Card>
-        <Card>
-          <CardHeader>
-            <CardTitle className="text-lg">{c.pastDueProjects}</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <p className="text-3xl font-bold">{pastDueProjects ?? 0}</p>
-          </CardContent>
-        </Card>
-        <Card>
-          <CardHeader>
-            <CardTitle className="text-lg">{c.suspendedProjects}</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <p className="text-3xl font-bold">{suspendedProjects ?? 0}</p>
-          </CardContent>
-        </Card>
-        <Card>
-          <CardHeader>
-            <CardTitle className="text-lg">{c.openAlerts}</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <p className="text-3xl font-bold">{openAlerts ?? 0}</p>
-          </CardContent>
-        </Card>
+      <DashboardPageHeader eyebrow={c.eyebrow} title={c.title} description={c.description} />
+
+      <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-4">
+        <DashboardStatCard label={c.clients} value={clientsCount ?? 0} icon={Users} />
+        <DashboardStatCard label={c.projects} value={projectsCount ?? 0} icon={FolderKanban} />
+        <DashboardStatCard label={c.openTickets} value={openTickets ?? 0} icon={Ticket} tone="warning" />
+        <DashboardStatCard label={c.pendingQuotes} value={pendingQuotes ?? 0} icon={FileText} />
+        <DashboardStatCard label={c.pastDueProjects} value={pastDueProjects ?? 0} icon={Clock3} tone="warning" />
+        <DashboardStatCard label={c.suspendedProjects} value={suspendedProjects ?? 0} icon={AlertTriangle} tone="warning" />
+        <DashboardStatCard label={c.openAlerts} value={openAlerts ?? 0} icon={AlertTriangle} tone="warning" />
       </div>
 
-      <div className="grid gap-4 lg:grid-cols-2">
+      <div className="grid gap-4 xl:grid-cols-2">
         <Card>
           <CardHeader>
             <CardTitle>{c.expirations}</CardTitle>
           </CardHeader>
-          <CardContent className="space-y-2">
+          <CardContent className="space-y-3">
+            {(expirations ?? []).length === 0 ? <EmptyState title={c.noExpirations} description={c.noExpirationsBody} compact icon={Clock3} /> : null}
             {(expirations ?? []).map((project) => (
-              <div key={project.id} className="flex items-center justify-between gap-3 rounded-md border border-border p-3 text-sm">
+              <div key={project.id} className="flex items-center justify-between gap-3 rounded-xl border border-border p-4 text-sm">
                 <div>
                   <p className="font-medium">{project.name}</p>
                   <p className="text-xs text-muted-foreground">
@@ -146,9 +125,10 @@ export default async function AdminOverviewPage() {
           <CardHeader>
             <CardTitle>{c.recentTickets}</CardTitle>
           </CardHeader>
-          <CardContent className="space-y-2 text-sm">
+          <CardContent className="space-y-3 text-sm">
+            {(recentTickets ?? []).length === 0 ? <EmptyState title={c.noTickets} description={c.noTicketsBody} compact icon={Ticket} /> : null}
             {(recentTickets ?? []).map((ticket) => (
-              <div key={ticket.id} className="rounded-md border border-border p-3">
+              <div key={ticket.id} className="rounded-xl border border-border p-4">
                 <p className="font-medium">{ticket.subject}</p>
                 <p className="text-xs text-muted-foreground">
                   {ticket.type} • {ticket.status} • {formatDate(ticket.created_at)}

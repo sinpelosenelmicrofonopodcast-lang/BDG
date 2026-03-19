@@ -1,16 +1,22 @@
 import { getServerLocale } from "@/lib/i18n/server";
 import { getSupabaseServerClient } from "@/lib/supabase/server";
 import { formatDate } from "@/lib/utils";
+import { DashboardPageHeader } from "@/components/dashboard/page-header";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { AdminCreateClientForm } from "@/components/dashboard/admin-create-client-form";
 import { AdminInternalNoteForm } from "@/components/dashboard/admin-internal-note-form";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { EmptyState } from "@/components/ui/empty-state";
 
 type SearchParams = Promise<{ q?: string }>;
 
 const copy = {
   en: {
+    eyebrow: "Admin CRM",
     title: "Clients CRM",
+    description: "Search clients, check delivery risk, open balances and leave internal notes without jumping across modules.",
     filters: "Filters",
     search: "Search",
     apply: "Apply",
@@ -22,10 +28,14 @@ const copy = {
     balance: "Balance",
     expiringSoon: "Expiring soon",
     recentNotes: "Recent notes",
-    noNotes: "No notes yet"
+    noNotes: "No notes yet",
+    empty: "No clients match this search.",
+    emptyBody: "Try another term or create a new client record."
   },
   es: {
+    eyebrow: "CRM admin",
     title: "CRM de clientes",
+    description: "Busca clientes, revisa riesgo operativo, balance pendiente y deja notas internas sin saltar entre modulos.",
     filters: "Filtros",
     search: "Buscar",
     apply: "Aplicar",
@@ -37,7 +47,9 @@ const copy = {
     balance: "Balance",
     expiringSoon: "Expiran pronto",
     recentNotes: "Notas recientes",
-    noNotes: "Sin notas"
+    noNotes: "Sin notas",
+    empty: "Ningun cliente coincide con la busqueda.",
+    emptyBody: "Prueba otro termino o crea un nuevo cliente."
   }
 } as const;
 
@@ -120,6 +132,8 @@ export default async function AdminClientsPage({ searchParams }: { searchParams:
 
   return (
     <div className="space-y-4">
+      <DashboardPageHeader eyebrow={c.eyebrow} title={c.title} description={c.description} />
+
       <AdminCreateClientForm locale={locale} />
 
       <Card>
@@ -130,11 +144,11 @@ export default async function AdminClientsPage({ searchParams }: { searchParams:
           <form className="grid gap-3 md:grid-cols-[1fr_auto]" method="get">
             <label className="space-y-1 text-xs">
               <span className="text-muted-foreground">{c.search}</span>
-              <input name="q" defaultValue={query} className="h-9 w-full rounded-md border border-input bg-background px-2 text-sm" />
+              <Input name="q" defaultValue={query} />
             </label>
-            <button type="submit" className="h-9 rounded-md border border-border bg-secondary px-3 text-sm font-medium">
+            <Button type="submit" variant="outline" className="self-end">
               {c.apply}
-            </button>
+            </Button>
           </form>
         </CardContent>
       </Card>
@@ -144,13 +158,14 @@ export default async function AdminClientsPage({ searchParams }: { searchParams:
           <CardTitle>{c.title}</CardTitle>
         </CardHeader>
         <CardContent className="space-y-4">
+          {filteredClients.length === 0 ? <EmptyState title={c.empty} description={c.emptyBody} compact /> : null}
           {filteredClients.map((client) => {
             const projectStats = projectByClient.get(client.id) ?? { total: 0, service: {}, billing: {}, expiringSoon: 0 };
             const clientBalance = balanceByClient.get(client.id) ?? 0;
             const clientNotes = notesByClient.get(client.id)?.slice(0, 3) ?? [];
 
             return (
-              <div key={client.id} className="space-y-3 rounded-md border border-border p-3 text-sm">
+              <div key={client.id} className="space-y-3 rounded-xl border border-border p-4 text-sm">
                 <div className="flex flex-wrap items-center justify-between gap-3">
                   <div>
                     <p className="font-semibold">{client.full_name || client.email || client.id}</p>

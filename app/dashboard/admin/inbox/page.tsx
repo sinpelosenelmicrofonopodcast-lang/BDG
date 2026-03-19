@@ -1,14 +1,18 @@
 import Link from "next/link";
+import { Inbox, Mail, MessageSquare, PenTool, Ticket } from "lucide-react";
 import { getServerLocale } from "@/lib/i18n/server";
 import { formatDate } from "@/lib/utils";
 import { getSupabaseServerClient } from "@/lib/supabase/server";
+import { DashboardPageHeader } from "@/components/dashboard/page-header";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { EmptyState } from "@/components/ui/empty-state";
 
 const copy = {
   en: {
-    title: "Admin Inbox",
-    subtitle: "All incoming client writing in one place.",
+    eyebrow: "Admin inbox",
+    title: "Incoming demand and support",
+    description: "One place for leads, quote requests, support tickets and client messages.",
     editPlans: "Edit plans",
     editAddons: "Edit add-ons",
     leads: "Leads and contact messages",
@@ -20,12 +24,14 @@ const copy = {
     budget: "Budget",
     industry: "Industry",
     needs: "Needs",
-    empty: "No items yet.",
+    empty: "Nothing here yet.",
+    emptyBody: "New demand and support items will land here automatically.",
     noText: "No text provided"
   },
   es: {
-    title: "Inbox Admin",
-    subtitle: "Todo lo que escriben los clientes en un solo lugar.",
+    eyebrow: "Inbox admin",
+    title: "Demanda entrante y soporte",
+    description: "Un solo lugar para leads, solicitudes de cotizacion, tickets y mensajes de clientes.",
     editPlans: "Editar planes",
     editAddons: "Editar add-ons",
     leads: "Leads y mensajes de contacto",
@@ -37,7 +43,8 @@ const copy = {
     budget: "Presupuesto",
     industry: "Industria",
     needs: "Necesidades",
-    empty: "Aún no hay elementos.",
+    empty: "Todavia no hay elementos.",
+    emptyBody: "Los nuevos leads, solicitudes y mensajes apareceran aqui automaticamente.",
     noText: "Sin texto"
   }
 } as const;
@@ -119,29 +126,31 @@ export default async function AdminInboxPage() {
 
   return (
     <div className="space-y-6">
-      <Card>
-        <CardHeader>
-          <CardTitle>{c.title}</CardTitle>
-          <p className="text-sm text-muted-foreground">{c.subtitle}</p>
-        </CardHeader>
-        <CardContent className="flex flex-wrap gap-3">
-          <Button asChild variant="outline">
-            <Link href="/dashboard/admin/plans">{c.editPlans}</Link>
-          </Button>
-          <Button asChild variant="outline">
-            <Link href="/dashboard/admin/addons">{c.editAddons}</Link>
-          </Button>
-        </CardContent>
-      </Card>
+      <DashboardPageHeader
+        eyebrow={c.eyebrow}
+        title={c.title}
+        description={c.description}
+        actions={
+          <>
+            <Button asChild variant="outline">
+              <Link href="/dashboard/admin/plans">{c.editPlans}</Link>
+            </Button>
+            <Button asChild variant="outline">
+              <Link href="/dashboard/admin/addons">{c.editAddons}</Link>
+            </Button>
+          </>
+        }
+      />
 
-      <div className="grid gap-4 lg:grid-cols-2">
+      <div className="grid gap-4 xl:grid-cols-2">
         <Card>
           <CardHeader>
             <CardTitle>{c.leads}</CardTitle>
           </CardHeader>
           <CardContent className="space-y-3 text-sm">
+            {leadsRows.length === 0 ? <EmptyState title={c.empty} description={c.emptyBody} compact icon={Mail} /> : null}
             {leadsRows.map((lead) => (
-              <div key={lead.id} className="rounded-md border border-border p-3">
+              <div key={lead.id} className="rounded-xl border border-border p-4">
                 <p className="font-medium">{lead.full_name}</p>
                 <p className="text-xs text-muted-foreground">
                   {lead.email} {lead.phone ? `• ${lead.phone}` : ""}
@@ -149,10 +158,9 @@ export default async function AdminInboxPage() {
                 <p className="mt-1 text-xs text-muted-foreground">
                   {c.source}: {lead.source} • {c.status}: {lead.status} • {formatDate(lead.created_at)}
                 </p>
-                <p className="mt-2">{lead.notes || c.noText}</p>
+                <p className="mt-3 leading-6">{lead.notes || c.noText}</p>
               </div>
             ))}
-            {leadsRows.length === 0 ? <p className="text-muted-foreground">{c.empty}</p> : null}
           </CardContent>
         </Card>
 
@@ -161,8 +169,9 @@ export default async function AdminInboxPage() {
             <CardTitle>{c.quoteRequests}</CardTitle>
           </CardHeader>
           <CardContent className="space-y-3 text-sm">
+            {quoteRows.length === 0 ? <EmptyState title={c.empty} description={c.emptyBody} compact icon={PenTool} /> : null}
             {quoteRows.map((row) => (
-              <div key={row.id} className="rounded-md border border-border p-3">
+              <div key={row.id} className="rounded-xl border border-border p-4">
                 <p className="font-medium">{row.business_name}</p>
                 <p className="text-xs text-muted-foreground">
                   {row.email} • {row.phone}
@@ -170,33 +179,32 @@ export default async function AdminInboxPage() {
                 <p className="mt-1 text-xs text-muted-foreground">
                   {c.status}: {row.status} • {c.budget}: ${row.budget} • {c.industry}: {row.industry} • {formatDate(row.created_at)}
                 </p>
-                <p className="mt-2">
+                <p className="mt-3">
                   <strong>{c.needs}:</strong> {row.needs.join(", ")}
                 </p>
-                <p className="mt-1">{row.notes || c.noText}</p>
+                <p className="mt-2 leading-6">{row.notes || c.noText}</p>
               </div>
             ))}
-            {quoteRows.length === 0 ? <p className="text-muted-foreground">{c.empty}</p> : null}
           </CardContent>
         </Card>
       </div>
 
-      <div className="grid gap-4 lg:grid-cols-2">
+      <div className="grid gap-4 xl:grid-cols-2">
         <Card>
           <CardHeader>
             <CardTitle>{c.clientTickets}</CardTitle>
           </CardHeader>
           <CardContent className="space-y-3 text-sm">
+            {ticketRows.length === 0 ? <EmptyState title={c.empty} description={c.emptyBody} compact icon={Ticket} /> : null}
             {ticketRows.map((ticket) => (
-              <div key={ticket.id} className="rounded-md border border-border p-3">
+              <div key={ticket.id} className="rounded-xl border border-border p-4">
                 <p className="font-medium">{ticket.subject}</p>
                 <p className="mt-1 text-xs text-muted-foreground">
                   {ticket.type} • {ticket.status} • {ticket.priority} • {formatDate(ticket.created_at)}
                 </p>
-                <p className="mt-2">{ticket.description || c.noText}</p>
+                <p className="mt-3 leading-6">{ticket.description || c.noText}</p>
               </div>
             ))}
-            {ticketRows.length === 0 ? <p className="text-muted-foreground">{c.empty}</p> : null}
           </CardContent>
         </Card>
 
@@ -205,16 +213,16 @@ export default async function AdminInboxPage() {
             <CardTitle>{c.clientMessages}</CardTitle>
           </CardHeader>
           <CardContent className="space-y-3 text-sm">
+            {messageRows.length === 0 ? <EmptyState title={c.empty} description={c.emptyBody} compact icon={MessageSquare} /> : null}
             {messageRows.map((message) => (
-              <div key={message.id} className="rounded-md border border-border p-3">
+              <div key={message.id} className="rounded-xl border border-border p-4">
                 <p className="font-medium">
                   <ShortId id={message.sender_id} />
                 </p>
                 <p className="mt-1 text-xs text-muted-foreground">{formatDate(message.created_at)}</p>
-                <p className="mt-2">{message.body || c.noText}</p>
+                <p className="mt-3 leading-6">{message.body || c.noText}</p>
               </div>
             ))}
-            {messageRows.length === 0 ? <p className="text-muted-foreground">{c.empty}</p> : null}
           </CardContent>
         </Card>
       </div>

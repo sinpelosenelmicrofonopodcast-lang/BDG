@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useLanguage } from "@/components/i18n/language-provider";
@@ -16,7 +16,8 @@ import { Textarea } from "@/components/ui/textarea";
 
 const content = {
   en: {
-    title: "Name Your Plan Wizard",
+    title: "Define your ideal system",
+    subtitle: "Move through the steps and we will turn your answers into a viable launch recommendation.",
     stepTitles: ["Budget", "Industry", "Needs", "Details", "Confirm"],
     step1: "Step 1: Budget",
     step2: "Step 2: Industry",
@@ -44,7 +45,8 @@ const content = {
     needs: ["Landing", "3 pages", "Logo", "SEO", "Booking", "Payments", "Blog"]
   },
   es: {
-    title: "Wizard Nombra Tu Plan",
+    title: "Define tu sistema ideal",
+    subtitle: "Avanza por los pasos y convertiremos tus respuestas en una recomendacion viable para lanzar.",
     stepTitles: ["Presupuesto", "Industria", "Necesidades", "Detalles", "Confirmar"],
     step1: "Paso 1: Presupuesto",
     step2: "Paso 2: Industria",
@@ -105,16 +107,13 @@ export function NameYourPlanWizard() {
 
   const values = watch();
 
-  const stepValidationFields = useMemo(
-    () => ({
-      1: ["budget"] as const,
-      2: ["industry"] as const,
-      3: ["needs"] as const,
-      4: ["businessName", "email", "phone"] as const,
-      5: ["budget", "industry", "needs", "businessName", "email", "phone", "notes"] as const
-    }),
-    []
-  );
+  const stepValidationFields = {
+    1: ["budget"] as const,
+    2: ["industry"] as const,
+    3: ["needs"] as const,
+    4: ["businessName", "email", "phone"] as const,
+    5: ["budget", "industry", "needs", "businessName", "email", "phone", "notes"] as const
+  };
 
   const next = async () => {
     const isValid = await trigger(stepValidationFields[step as keyof typeof stepValidationFields]);
@@ -168,6 +167,7 @@ export function NameYourPlanWizard() {
     <Card>
       <CardHeader className="space-y-4">
         <CardTitle className="text-2xl">{c.title}</CardTitle>
+        <p className="text-sm leading-6 text-muted-foreground">{c.subtitle}</p>
         <div className="h-2 rounded-full bg-secondary">
           <div className="h-full rounded-full bg-primary transition-all" style={{ width: progress }} />
         </div>
@@ -278,7 +278,7 @@ export function NameYourPlanWizard() {
             <div className="space-y-4 rounded-lg border border-border bg-secondary/40 p-4 text-sm">
               {submittedId ? (
                 <div className="space-y-2">
-                  <p className="font-semibold text-emerald-700">{c.successTitle}</p>
+                  <p className="font-semibold text-status-success">{c.successTitle}</p>
                   <p className="text-muted-foreground">
                     {c.requestId}: {submittedId}
                   </p>

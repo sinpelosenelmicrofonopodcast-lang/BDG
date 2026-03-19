@@ -214,7 +214,7 @@ export function ContactSettingsForm({ locale, initialValues }: ContactSettingsFo
             {isSubmitting ? c.saving : c.save}
           </Button>
 
-          {status ? <p className={`text-sm ${statusType === "error" ? "text-destructive" : "text-emerald-600"}`}>{status}</p> : null}
+          {status ? <p className={`text-sm ${statusType === "error" ? "text-destructive" : "text-status-success"}`}>{status}</p> : null}
         </form>
       </CardContent>
     </Card>

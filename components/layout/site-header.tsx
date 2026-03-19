@@ -6,6 +6,7 @@ import { usePathname } from "next/navigation";
 import { Menu } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { LanguageToggle } from "@/components/layout/language-toggle";
+import { TopGrowthBanner } from "@/components/layout/top-growth-banner";
 import { useLanguage } from "@/components/i18n/language-provider";
 import { cn } from "@/lib/utils";
 
@@ -23,10 +24,10 @@ const navLabels = {
     blog: "Blog",
     contact: "Contact",
     namePlan: "Name Your Plan",
-    getQuote: "Get Quote",
+    getQuote: "Activate System",
     clientPortal: "Client Portal",
     adminPortal: "Admin Portal",
-    constructionBanner: "Under construction. Better improvements for you are coming soon."
+    topBannerAlt: "Activate your growth system."
   },
   es: {
     pricing: "Precios",
@@ -35,10 +36,10 @@ const navLabels = {
     blog: "Blog",
     contact: "Contacto",
     namePlan: "Nombra tu plan",
-    getQuote: "Cotizar",
+    getQuote: "Activar sistema",
     clientPortal: "Portal Cliente",
     adminPortal: "Portal Admin",
-    constructionBanner: "En construccion. Pronto vienen mejoras para ustedes."
+    topBannerAlt: "Activa tu sistema de crecimiento."
   }
 } as const;
 
@@ -65,13 +66,22 @@ export function SiteHeader({ viewerRole = "guest" }: SiteHeaderProps) {
 
   return (
     <header className="sticky top-0 z-50 border-b border-border/80 bg-background/95 backdrop-blur">
-      <div className="border-b border-border bg-secondary/70 px-4 py-2 text-center text-[11px] font-semibold uppercase tracking-[0.14em] text-foreground/90">
-        {c.constructionBanner}
+      <div className="relative h-[108px] w-full overflow-hidden border-b border-border/80 sm:h-[128px] md:h-[148px]">
+        <Link href="/pricing" className="block h-full w-full" aria-label={c.topBannerAlt}>
+          <TopGrowthBanner locale={locale} />
+        </Link>
       </div>
 
       <div className="container-shell flex h-[72px] items-center justify-between gap-4">
-        <Link href={homeHref} className="inline-flex items-center gap-3">
-          <Image src="/logo.png" alt="BDG" width={132} height={44} priority className="h-9 w-auto rounded-md border border-border bg-background p-1" />
+        <Link href={homeHref} className="inline-flex items-center rounded-md bg-black px-3 py-1.5 shadow-sm">
+          <Image
+            src="/logo-footer.png"
+            alt="BDG"
+            width={132}
+            height={44}
+            priority
+            className="h-8 w-auto sm:h-9"
+          />
         </Link>
 
         <nav className="hidden items-center gap-6 md:flex">

@@ -27,24 +27,25 @@ import { PricingCards } from "@/components/marketing/pricing-cards";
 import { FaqSection } from "@/components/marketing/faq-section";
 import { LeadMagnetForm } from "@/components/marketing/lead-magnet-form";
 import { TestimonialsSection } from "@/components/marketing/testimonials-section";
+import { AutomationShowcase } from "@/components/marketing/automation-showcase";
 
 const copy = {
   en: {
-    heroBadge: "Built for local businesses",
-    heroTitle: "Turn your website into a customer machine.",
+    heroBadge: "Autonomous business platform",
+    heroTitle: "Your business grows automatically.",
     heroSubtitle:
-      "Get more calls, reservations, orders and leads with a system designed for restaurants, food trucks, barbers, salons, realtors and local service businesses.",
-    ctaPrimary: "See Pricing",
-    ctaSecondary: "Name Your Plan",
+      "BDG creates content, posts daily, attracts customers, and converts them — without you doing anything.",
+    ctaPrimary: "Activate BDG",
+    ctaSecondary: "Watch Live Demo",
     ctaContact: "Contact",
-    heroCardTitle: "What you launch first",
+    heroCardTitle: "What BDG runs for you",
     heroCardItems: [
-      "Mobile-first pages that load fast",
-      "Direct contact CTA in every key section",
-      "Lead capture, booking or order flow",
-      "Simple dashboard to track activity"
+      "AI content generation every day",
+      "Multi-platform posting and scheduling",
+      "Lead capture from comments, DMs and clicks",
+      "One dashboard that shows the loop working"
     ],
-    heroTrust: ["No long contracts", "Fast setup", "Conversion-focused"],
+    heroTrust: ["AUTOMATIC daily posting", "Lead generation", "Self-running growth"],
     problemsEyebrow: "Problems We Solve",
     problemsTitle: "Most local businesses lose clients for the same 4 reasons",
     benefitsEyebrow: "Why It Works",
@@ -67,28 +68,28 @@ const copy = {
     leadEyebrow: "Free Audit",
     leadTitle: "Get a free growth audit in 24 hours",
     leadDescription: "We review your current website and show clear opportunities to improve leads, orders or bookings.",
-    finalEyebrow: "Ready To Start",
-    finalTitle: "If you want more clients this month, this is your next step",
-    finalSubtitle: "Choose a plan or tell us your budget. We will map the fastest path to launch.",
-    finalPrimary: "Start now",
+    finalEyebrow: "Activate Automation",
+    finalTitle: "Stop managing your business. Let it run itself.",
+    finalSubtitle: "Activate BDG and launch the system that creates content, attracts customers, and converts attention into revenue for you.",
+    finalPrimary: "Activate BDG Now",
     finalSecondary: "Contact us"
   },
   es: {
-    heroBadge: "Hecho para negocios locales",
-    heroTitle: "Convierte tu web en una maquina de clientes.",
+    heroBadge: "Plataforma autonoma de negocio",
+    heroTitle: "Tu negocio crece automaticamente.",
     heroSubtitle:
-      "Recibe mas llamadas, reservas, pedidos y leads con un sistema pensado para restaurantes, food trucks, barberos, esteticas, realtors y servicios locales.",
-    ctaPrimary: "Ver pricing",
-    ctaSecondary: "Nombra tu plan",
+      "BDG crea contenido, publica diario, atrae clientes y convierte ventas sin que tu hagas nada.",
+    ctaPrimary: "Activar BDG",
+    ctaSecondary: "Ver Demo En Vivo",
     ctaContact: "Contacto",
-    heroCardTitle: "Lo que lanzas primero",
+    heroCardTitle: "Lo que BDG corre por ti",
     heroCardItems: [
-      "Paginas mobile-first con carga rapida",
-      "CTA de contacto/llamada en puntos clave",
-      "Flujo de leads, reservas o pedidos",
-      "Dashboard simple para ver actividad"
+      "Generacion diaria de contenido con IA",
+      "Publicacion y agenda multi-plataforma",
+      "Captura de leads desde comentarios, DMs y clics",
+      "Un dashboard para ver el loop trabajando"
     ],
-    heroTrust: ["Sin contratos largos", "Setup rapido", "Enfoque en conversion"],
+    heroTrust: ["Publicacion AUTOMATICA", "Generacion de leads", "Crecimiento que corre solo"],
     problemsEyebrow: "Problemas Que Resolvemos",
     problemsTitle: "La mayoria de negocios locales pierde clientes por las mismas 4 razones",
     benefitsEyebrow: "Por Que Funciona",
@@ -111,10 +112,10 @@ const copy = {
     leadEyebrow: "Auditoria Gratis",
     leadTitle: "Recibe una auditoria de crecimiento en 24 horas",
     leadDescription: "Revisamos tu sitio actual y te mostramos oportunidades claras para mejorar leads, pedidos o reservas.",
-    finalEyebrow: "Listo Para Empezar",
-    finalTitle: "Si quieres mas clientes este mes, este es el siguiente paso",
-    finalSubtitle: "Elige un plan o dinos tu presupuesto. Te mostramos la ruta mas rapida para lanzar.",
-    finalPrimary: "Comenzar ahora",
+    finalEyebrow: "Activar Automatizacion",
+    finalTitle: "Deja de administrar tu negocio. Deja que se maneje solo.",
+    finalSubtitle: "Activa BDG y lanza el sistema que crea contenido, atrae clientes y convierte atencion en revenue por ti.",
+    finalPrimary: "Activar BDG Ahora",
     finalSecondary: "Contactarnos"
   }
 } as const;
@@ -343,7 +344,7 @@ export default async function HomePage() {
               <Link href="/pricing">{c.ctaPrimary}</Link>
             </Button>
             <Button asChild size="lg" variant="secondary">
-              <Link href="/name-your-plan">{c.ctaSecondary}</Link>
+              <Link href="/#automation-demo">{c.ctaSecondary}</Link>
             </Button>
             <Button asChild size="lg" variant="outline">
               {contactCta.isExternal ? (
@@ -378,6 +379,8 @@ export default async function HomePage() {
           </CardContent>
         </Card>
       </section>
+
+      <AutomationShowcase locale={locale} />
 
       <section className="container-shell space-y-7 py-8">
         <SectionTitle eyebrow={c.problemsEyebrow} title={c.problemsTitle} />
@@ -510,7 +513,7 @@ export default async function HomePage() {
             </div>
             <div className="flex flex-wrap gap-3">
               <Button asChild>
-                <Link href="/contact">{c.finalPrimary}</Link>
+                <Link href="/pricing">{c.finalPrimary}</Link>
               </Button>
               <Button asChild variant="outline">
                 {contactCta.isExternal ? (

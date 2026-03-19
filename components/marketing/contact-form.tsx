@@ -85,7 +85,7 @@ export function ContactForm() {
       <Button type="submit" disabled={isSubmitting}>
         {isSubmitting ? c.sending : c.send}
       </Button>
-      {status ? <p className="text-sm text-emerald-600">{status}</p> : null}
+      {status ? <p className="text-sm text-status-success">{status}</p> : null}
     </form>
   );
 }

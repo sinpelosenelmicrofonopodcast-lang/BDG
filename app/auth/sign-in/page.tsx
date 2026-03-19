@@ -220,7 +220,7 @@ export default function SignInPage() {
             </Button>
 
             {errorMessage ? <p className="rounded-md border border-destructive/30 bg-destructive/10 p-2 text-xs text-destructive">{errorMessage}</p> : null}
-            {infoMessage ? <p className="rounded-md border border-emerald-400/40 bg-emerald-500/10 p-2 text-xs text-emerald-700">{infoMessage}</p> : null}
+            {infoMessage ? <p className="rounded-md border border-status-success-soft bg-status-success-soft p-2 text-xs text-status-success">{infoMessage}</p> : null}
           </form>
         </CardContent>
       </Card>

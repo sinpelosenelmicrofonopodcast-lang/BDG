@@ -6,12 +6,12 @@ import { Button } from "@/components/ui/button";
 
 const copy = {
   en: {
-    getQuote: "Get Quote",
-    namePlan: "Name Plan"
+    getQuote: "Activate System",
+    namePlan: "Request Demo"
   },
   es: {
-    getQuote: "Cotizar",
-    namePlan: "Nombra plan"
+    getQuote: "Activar sistema",
+    namePlan: "Solicitar demo"
   }
 } as const;
 
@@ -26,7 +26,7 @@ export function StickyMobileCta() {
           <Link href="/pricing">{c.getQuote}</Link>
         </Button>
         <Button className="flex-1" variant="secondary" asChild>
-          <Link href="/name-your-plan">{c.namePlan}</Link>
+          <Link href="/contact">{c.namePlan}</Link>
         </Button>
       </div>
     </div>
