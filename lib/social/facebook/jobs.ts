@@ -7,12 +7,12 @@ import {
   countAutomatedPostsForDate,
   createSocialPost,
   createSocialPostLog,
+  ensureFacebookSystemAutomationContext,
   getAutomationSettings,
   getDecryptedUserToken,
   getFacebookAccountById,
   getFacebookConnectionForAdmin,
   getMediaAssetById,
-  getSelectedFacebookPage,
   getSelectedFacebookPageToken,
   getSocialPostById,
   listAutomationAccounts,
@@ -71,12 +71,6 @@ async function resolvePublishTarget(post: SocialPostRecord) {
 
     if (!systemPostingConfig.configured) {
       throw new Error("Missing META_SYSTEM_USER_ACCESS_TOKEN or META_PAGE_ID for automatic Facebook publishing.");
-    }
-
-    const selectedPage = await getSelectedFacebookPage(post.social_account_id);
-
-    if (selectedPage && selectedPage.facebook_page_id !== systemPostingConfig.pageId) {
-      throw new Error(`Selected Facebook page ${selectedPage.facebook_page_id} does not match META_PAGE_ID ${systemPostingConfig.pageId}.`);
     }
 
     return {
@@ -194,9 +188,6 @@ export async function runDailyAutomation() {
 
   for (const settings of accounts) {
     const now = new Date().toISOString();
-    const connection = await getFacebookConnectionForAdmin(settings.social_accounts.admin_user_id);
-    const account = connection.account;
-    const selectedPage = connection.selectedPage;
     const automationSettings = await getAutomationSettings(settings.social_account_id);
 
     if (!systemPostingConfig.configured) {
@@ -207,17 +198,18 @@ export async function runDailyAutomation() {
       continue;
     }
 
-    if (!account || !selectedPage || !automationSettings || account.reconnect_required || account.connection_status !== "connected") {
+    if (!automationSettings) {
       continue;
     }
 
-    if (selectedPage.facebook_page_id !== systemPostingConfig.pageId) {
-      await updateAutomationRunState(account.id, {
-        lastAutomationRunAt: now,
-        pauseReason: `Selected Facebook page ${selectedPage.facebook_page_id} does not match META_PAGE_ID ${systemPostingConfig.pageId}.`
-      });
+    const automationContext = await ensureFacebookSystemAutomationContext(settings.social_accounts.admin_user_id);
+
+    if (!automationContext) {
       continue;
     }
+
+    const account = automationContext.account;
+    const automationPage = automationContext.page;
 
     const dayKey = formatDateKeyInZone(new Date(), automationSettings.timezone);
     const dayStart = startOfDayUtc(dayKey, automationSettings.timezone);
@@ -248,7 +240,7 @@ export async function runDailyAutomation() {
       const caption = renderTemplateCopy(template, "medium", automationSettings);
       const ctaUsed = automationSettings.cta_label;
 
-      await createSocialPost(account.id, selectedPage.id, account.admin_user_id, {
+      await createSocialPost(account.id, automationPage.id, account.admin_user_id, {
         caption,
         mediaAssetId,
         templateId: template.id,

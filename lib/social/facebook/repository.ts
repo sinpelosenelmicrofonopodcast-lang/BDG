@@ -1,6 +1,7 @@
 import "server-only";
 
 import { decryptSecret, encryptSecret } from "@/lib/security/encryption";
+import { getFacebookSystemPostingConfig } from "@/lib/social/facebook/config";
 import { getSupabaseAdminClient } from "@/lib/supabase/admin";
 import type { FacebookAutomationSettingsInput, FacebookPostCreateInput } from "@/lib/schemas/facebook-automation";
 import type {
@@ -13,6 +14,9 @@ import type {
   SocialPostRecord,
   SocialTemplateRecord
 } from "@/lib/social/facebook/types";
+
+const SYSTEM_PAGE_NAME = "Meta system page";
+const SYSTEM_PAGE_TOKEN_SENTINEL = "__META_SYSTEM_PAGE__";
 
 export async function getFacebookConnectionForAdmin(adminUserId: string) {
   const supabase = getSupabaseAdminClient();
@@ -48,6 +52,124 @@ export async function getFacebookAccountById(accountId: string) {
   const { data } = await supabase.from("social_accounts").select("*").eq("id", accountId).maybeSingle<SocialAccountRecord>();
 
   return data ?? null;
+}
+
+export async function ensureFacebookSystemAutomationContext(adminUserId: string) {
+  const systemPostingConfig = getFacebookSystemPostingConfig();
+
+  if (!systemPostingConfig.configured) {
+    return null;
+  }
+
+  const supabase = getSupabaseAdminClient();
+  const now = new Date().toISOString();
+  let { data: account } = await supabase
+    .from("social_accounts")
+    .select("*")
+    .eq("provider", "facebook")
+    .eq("admin_user_id", adminUserId)
+    .maybeSingle<SocialAccountRecord>();
+
+  if (!account) {
+    const { data, error } = await supabase
+      .from("social_accounts")
+      .insert({
+        provider: "facebook",
+        admin_user_id: adminUserId,
+        facebook_page_id: systemPostingConfig.pageId,
+        page_name: SYSTEM_PAGE_NAME,
+        connection_status: "connected",
+        reconnect_required: false,
+        last_error_message: null,
+        token_last_validated_at: now
+      })
+      .select("*")
+      .single<SocialAccountRecord>();
+
+    if (error || !data) {
+      throw new Error(error?.message ?? "Failed to create Facebook automation account.");
+    }
+
+    account = data;
+  } else if (account.facebook_page_id !== systemPostingConfig.pageId || account.page_name !== SYSTEM_PAGE_NAME) {
+    const { data, error } = await supabase
+      .from("social_accounts")
+      .update({
+        facebook_page_id: systemPostingConfig.pageId,
+        page_name: SYSTEM_PAGE_NAME,
+        connection_status: "connected",
+        reconnect_required: false,
+        last_error_message: null,
+        token_last_validated_at: now
+      })
+      .eq("id", account.id)
+      .select("*")
+      .single<SocialAccountRecord>();
+
+    if (error || !data) {
+      throw new Error(error?.message ?? "Failed to sync Facebook automation account.");
+    }
+
+    account = data;
+  }
+
+  const { data: existingPages } = await supabase.from("social_pages").select("*").eq("social_account_id", account.id);
+  const typedPages = (existingPages ?? []) as SocialPageRecord[];
+  const existingSystemPage = typedPages.find((page) => page.facebook_page_id === systemPostingConfig.pageId) ?? null;
+  const hasSelectedPage = typedPages.some((page) => page.is_selected);
+
+  if (!existingSystemPage) {
+    const { data, error } = await supabase
+      .from("social_pages")
+      .insert({
+        social_account_id: account.id,
+        provider: "facebook",
+        facebook_page_id: systemPostingConfig.pageId,
+        page_name: SYSTEM_PAGE_NAME,
+        access_token_encrypted: SYSTEM_PAGE_TOKEN_SENTINEL,
+        token_type: "system",
+        scopes: [],
+        tasks: ["MANAGE", "CREATE_CONTENT"],
+        is_selected: !hasSelectedPage,
+        connection_status: "connected",
+        reconnect_required: false,
+        token_last_validated_at: now
+      })
+      .select("*")
+      .single<SocialPageRecord>();
+
+    if (error || !data) {
+      throw new Error(error?.message ?? "Failed to create Facebook automation page.");
+    }
+
+    return {
+      account,
+      page: data
+    };
+  }
+
+  const { data: page, error: pageError } = await supabase
+    .from("social_pages")
+    .update({
+      page_name: SYSTEM_PAGE_NAME,
+      token_type: "system",
+      tasks: ["MANAGE", "CREATE_CONTENT"],
+      connection_status: "connected",
+      reconnect_required: false,
+      token_last_validated_at: now
+    })
+    .eq("id", existingSystemPage.id)
+    .select("*")
+    .single<SocialPageRecord>();
+
+  if (pageError || !page) {
+    throw new Error(pageError?.message ?? "Failed to sync Facebook automation page.");
+  }
+
+  return {
+    account,
+    page
+  };
 }
 
 export async function upsertFacebookConnection(params: {

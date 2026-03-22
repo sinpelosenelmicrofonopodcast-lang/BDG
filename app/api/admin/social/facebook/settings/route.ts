@@ -1,7 +1,7 @@
 import { NextResponse } from "next/server";
 import { getAdminApiContext } from "@/lib/auth/admin-api";
 import { facebookAutomationSettingsSchema } from "@/lib/schemas/facebook-automation";
-import { getFacebookConnectionForAdmin, upsertAutomationSettings } from "@/lib/social/facebook/repository";
+import { ensureFacebookSystemAutomationContext, upsertAutomationSettings } from "@/lib/social/facebook/repository";
 import { getSupabaseAdminClient } from "@/lib/supabase/admin";
 
 export async function PATCH(request: Request) {
@@ -11,14 +11,10 @@ export async function PATCH(request: Request) {
     return error as NextResponse;
   }
 
-  const connection = await getFacebookConnectionForAdmin(context.user.id);
+  const automationContext = await ensureFacebookSystemAutomationContext(context.user.id);
 
-  if (!connection.account || !connection.selectedPage) {
-    return NextResponse.json({ error: "Connect Facebook and select a page first." }, { status: 400 });
-  }
-
-  if (connection.account.reconnect_required) {
-    return NextResponse.json({ error: "Reconnect Facebook before enabling automation." }, { status: 409 });
+  if (!automationContext) {
+    return NextResponse.json({ error: "Missing META_SYSTEM_USER_ACCESS_TOKEN or META_PAGE_ID." }, { status: 400 });
   }
 
   const body = await request.json().catch(() => null);
@@ -29,7 +25,7 @@ export async function PATCH(request: Request) {
   }
 
   try {
-    const settings = await upsertAutomationSettings(connection.account.id, parsed.data);
+    const settings = await upsertAutomationSettings(automationContext.account.id, parsed.data);
     const supabase = getSupabaseAdminClient();
 
     await supabase.from("admin_audit_log").insert({

@@ -177,6 +177,8 @@ export function FacebookAutomationWorkspace({
   const selectedTemplate = templates.find((template) => template.id === selectedTemplateId) ?? null;
   const selectedMedia = mediaAssets.find((asset) => asset.id === selectedMediaId) ?? null;
   const previewImage = localMediaPreview ?? selectedMedia?.previewUrl ?? null;
+  const automaticModeReady = envStatus.metaSystemUserAccessToken && envStatus.metaPageId;
+  const manualConnectionReady = Boolean(connection.account?.access_token_encrypted && connection.selectedPage && connection.selectedPage.access_token_encrypted !== "__META_SYSTEM_PAGE__");
 
   const previewCaption = useMemo(() => {
     if (caption.trim()) {
@@ -517,7 +519,7 @@ export function FacebookAutomationWorkspace({
                 <p className="mt-2 text-lg font-semibold">{connection.account?.reconnect_required ? "Needs attention" : "Healthy"}</p>
                 <p className="mt-1 text-sm text-muted-foreground">
                   {connection.account?.last_error_message ??
-                    "Manual posts publish with the stored page token. Automatic posts use META_SYSTEM_USER_ACCESS_TOKEN and META_PAGE_ID from the server."}
+                    "Automatic posts run directly from META_SYSTEM_USER_ACCESS_TOKEN and META_PAGE_ID. Facebook Login is only needed for the manual composer."}
                 </p>
               </div>
             </div>
@@ -543,11 +545,11 @@ export function FacebookAutomationWorkspace({
                 {isPending ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <Facebook className="mr-2 h-4 w-4" />}
                 Connect with Facebook
               </Button>
-              <Button variant="outline" onClick={validateConnection} disabled={!connection.account || isPending}>
+              <Button variant="outline" onClick={validateConnection} disabled={!connection.account?.access_token_encrypted || isPending}>
                 <RefreshCcw className="mr-2 h-4 w-4" />
                 Validate connection
               </Button>
-              <Button variant="outline" onClick={runAutomationNow} disabled={!connection.account || isPending}>
+              <Button variant="outline" onClick={runAutomationNow} disabled={!automaticModeReady || isPending}>
                 <PlayCircle className="mr-2 h-4 w-4" />
                 Run now
               </Button>
@@ -748,15 +750,15 @@ export function FacebookAutomationWorkspace({
             </div>
 
             <div className="flex flex-wrap gap-3">
-              <Button variant="outline" onClick={() => submitPost("draft")} disabled={!connection.selectedPage || isPending}>
+              <Button variant="outline" onClick={() => submitPost("draft")} disabled={!manualConnectionReady || isPending}>
                 <Save className="mr-2 h-4 w-4" />
                 Save draft
               </Button>
-              <Button variant="outline" onClick={() => submitPost("schedule")} disabled={!connection.selectedPage || isPending}>
+              <Button variant="outline" onClick={() => submitPost("schedule")} disabled={!manualConnectionReady || isPending}>
                 <Clock3 className="mr-2 h-4 w-4" />
                 Schedule post
               </Button>
-              <Button onClick={() => submitPost("publish_now")} disabled={!connection.selectedPage || isPending}>
+              <Button onClick={() => submitPost("publish_now")} disabled={!manualConnectionReady || isPending}>
                 <Send className="mr-2 h-4 w-4" />
                 Publish now
               </Button>
@@ -805,15 +807,15 @@ export function FacebookAutomationWorkspace({
               <div className="mt-3 space-y-3 text-sm text-muted-foreground">
                 <div className="flex items-start gap-3">
                   <CheckCircle2 className="mt-0.5 h-4 w-4 text-status-success" />
-                  <p>Manual publishing uses the stored page access token, while automatic publishing uses META_SYSTEM_USER_ACCESS_TOKEN and META_PAGE_ID on the server.</p>
+                  <p>Automatic publishing uses only META_SYSTEM_USER_ACCESS_TOKEN and META_PAGE_ID on the server.</p>
                 </div>
                 <div className="flex items-start gap-3">
                   <CheckCircle2 className="mt-0.5 h-4 w-4 text-status-success" />
-                  <p>User tokens are exchanged for long-lived tokens and never used directly on the client for publishing.</p>
+                  <p>Facebook Login and stored page tokens are only required if you want to use the manual composer.</p>
                 </div>
                 <div className="flex items-start gap-3">
                   <AlertTriangle className="mt-0.5 h-4 w-4 text-status-warning" />
-                  <p>If META_PAGE_ID does not match the selected page or the automatic token is missing, automation pauses instead of publishing to the wrong destination.</p>
+                  <p>If META_SYSTEM_USER_ACCESS_TOKEN or META_PAGE_ID is missing, automation pauses instead of failing silently.</p>
                 </div>
               </div>
             </div>
@@ -945,7 +947,7 @@ export function FacebookAutomationWorkspace({
           </div>
 
           <div className="flex flex-wrap gap-3">
-            <Button onClick={saveAutomationSettings} disabled={savingSettings || !connection.selectedPage}>
+            <Button onClick={saveAutomationSettings} disabled={savingSettings || !automaticModeReady}>
               {savingSettings ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <Megaphone className="mr-2 h-4 w-4" />}
               Save automation settings
             </Button>
