@@ -1,7 +1,7 @@
 import { redirect } from "next/navigation";
 import { Bot, CalendarClock, FileText, History, LineChart, PlugZap, Wand2 } from "lucide-react";
 import { getCurrentUser } from "@/lib/auth";
-import { getFacebookPublicConfig, hasSocialCronSecret } from "@/lib/social/facebook/config";
+import { getFacebookPublicConfig, getFacebookSystemPostingConfig, hasSocialCronSecret } from "@/lib/social/facebook/config";
 import {
   listFacebookMediaAssets,
   listFacebookTemplates,
@@ -92,11 +92,14 @@ export default async function FacebookAutomationPage() {
 
   const metrics = buildMetrics(posts);
   const categories = [...new Set(templates.map((template) => template.category))];
+  const systemPostingConfig = getFacebookSystemPostingConfig();
   const envStatus = {
     appId: Boolean(process.env.NEXT_PUBLIC_FACEBOOK_APP_ID),
     appSecret: Boolean(process.env.FACEBOOK_APP_SECRET),
     encryption: Boolean(process.env.FACEBOOK_TOKEN_ENCRYPTION_KEY),
-    cron: hasSocialCronSecret()
+    cron: hasSocialCronSecret(),
+    metaSystemUserAccessToken: Boolean(systemPostingConfig.accessToken),
+    metaPageId: Boolean(systemPostingConfig.pageId)
   };
   const publicConfig = getFacebookPublicConfig();
 

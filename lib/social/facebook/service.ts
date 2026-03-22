@@ -33,7 +33,7 @@ type FacebookTokenExchangeResult = {
 
 type CreateFacebookPostInput = {
   pageId: string;
-  pageAccessToken: string;
+  accessToken: string;
   caption: string;
   image?: {
     data: Blob;
@@ -154,7 +154,7 @@ export async function validateStoredToken(token: string): Promise<TokenValidatio
 export async function createFacebookPost(input: CreateFacebookPostInput): Promise<{ post_id?: string; id?: string }> {
   if (input.image) {
     const formData = new FormData();
-    formData.append("access_token", input.pageAccessToken);
+    formData.append("access_token", input.accessToken);
     formData.append("message", input.caption);
     formData.append("source", input.image.data, input.image.filename ?? "social-image.jpg");
 
@@ -168,7 +168,7 @@ export async function createFacebookPost(input: CreateFacebookPostInput): Promis
   }
 
   const body = new URLSearchParams({
-    access_token: input.pageAccessToken,
+    access_token: input.accessToken,
     message: input.caption
   });
   const response = await fetch(buildGraphUrl(`/${input.pageId}/feed`), {

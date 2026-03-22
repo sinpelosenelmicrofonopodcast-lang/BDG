@@ -1,5 +1,6 @@
 import "server-only";
 
+import { getFacebookSystemPostingConfig } from "@/lib/social/facebook/config";
 import { formatDateKeyInZone, zonedDateTimeToUtc } from "@/lib/timezone";
 import { renderTemplateCopy } from "@/lib/social/facebook/copy";
 import {
@@ -11,6 +12,7 @@ import {
   getFacebookAccountById,
   getFacebookConnectionForAdmin,
   getMediaAssetById,
+  getSelectedFacebookPage,
   getSelectedFacebookPageToken,
   getSocialPostById,
   listAutomationAccounts,
@@ -25,6 +27,7 @@ import {
   updateSocialPost
 } from "@/lib/social/facebook/repository";
 import { createFacebookPost, validateStoredToken, FacebookServiceError } from "@/lib/social/facebook/service";
+import type { SocialPostRecord } from "@/lib/social/facebook/types";
 
 function startOfDayUtc(dateKey: string, timeZone: string) {
   return zonedDateTimeToUtc(dateKey, "00:00", timeZone).toISOString();
@@ -62,29 +65,45 @@ async function loadPublishImage(postId: string) {
   };
 }
 
+async function resolvePublishTarget(post: SocialPostRecord) {
+  if (post.is_automated) {
+    const systemPostingConfig = getFacebookSystemPostingConfig();
+
+    if (!systemPostingConfig.configured) {
+      throw new Error("Missing META_SYSTEM_USER_ACCESS_TOKEN or META_PAGE_ID for automatic Facebook publishing.");
+    }
+
+    const selectedPage = await getSelectedFacebookPage(post.social_account_id);
+
+    if (selectedPage && selectedPage.facebook_page_id !== systemPostingConfig.pageId) {
+      throw new Error(`Selected Facebook page ${selectedPage.facebook_page_id} does not match META_PAGE_ID ${systemPostingConfig.pageId}.`);
+    }
+
+    return {
+      pageId: systemPostingConfig.pageId,
+      accessToken: systemPostingConfig.accessToken,
+      authSource: "meta_system_user_access_token"
+    } as const;
+  }
+
+  const selectedPageToken = await getSelectedFacebookPageToken(post.social_account_id);
+
+  if (!selectedPageToken) {
+    return null;
+  }
+
+  return {
+    pageId: selectedPageToken.page.facebook_page_id,
+    accessToken: selectedPageToken.accessToken,
+    authSource: "stored_page_access_token"
+  } as const;
+}
+
 export async function publishFacebookPost(postId: string) {
   const post = await getSocialPostById(postId);
 
   if (!post) {
     throw new Error("Post not found.");
-  }
-
-  const { page, accessToken } = (await getSelectedFacebookPageToken(post.social_account_id)) ?? {};
-
-  if (!page || !accessToken) {
-    await markPostPublishResult({
-      postId,
-      status: "failed",
-      errorMessage: "Facebook page connection is missing."
-    });
-    await createSocialPostLog({
-      postId,
-      socialAccountId: post.social_account_id,
-      action: "publish_post",
-      status: "error",
-      message: "Missing page token or selected page."
-    });
-    throw new Error("Missing Facebook page connection.");
   }
 
   await updateSocialPost(postId, { status: "publishing" });
@@ -93,14 +112,20 @@ export async function publishFacebookPost(postId: string) {
     socialAccountId: post.social_account_id,
     action: "publish_post",
     status: "info",
-    message: "Publishing post to Facebook."
+    message: post.is_automated ? "Publishing automatic post to Facebook with Meta system credentials." : "Publishing post to Facebook."
   });
 
   try {
+    const publishTarget = await resolvePublishTarget(post);
+
+    if (!publishTarget) {
+      throw new Error("Missing Facebook page connection.");
+    }
+
     const image = await loadPublishImage(postId);
     const payload = await createFacebookPost({
-      pageId: page.facebook_page_id,
-      pageAccessToken: accessToken,
+      pageId: publishTarget.pageId,
+      accessToken: publishTarget.accessToken,
       caption: post.caption,
       image
     });
@@ -120,7 +145,9 @@ export async function publishFacebookPost(postId: string) {
       status: "success",
       message: "Facebook post published successfully.",
       providerResponse: {
-        postId: payload.post_id ?? payload.id ?? null
+        postId: payload.post_id ?? payload.id ?? null,
+        authSource: publishTarget.authSource,
+        pageId: publishTarget.pageId
       }
     });
 
@@ -143,7 +170,7 @@ export async function publishFacebookPost(postId: string) {
       message
     });
 
-    if (error instanceof FacebookServiceError && error.isAuthError) {
+    if (error instanceof FacebookServiceError && error.isAuthError && !post.is_automated) {
       await markReconnectRequired({
         socialAccountId: post.social_account_id,
         message
@@ -162,15 +189,33 @@ export async function runDailyAutomation() {
   const accounts = await listAutomationAccounts();
   const templates = await listFacebookTemplates();
   const mediaAssets = await listFacebookMediaAssets(12);
+  const systemPostingConfig = getFacebookSystemPostingConfig();
   let created = 0;
 
   for (const settings of accounts) {
+    const now = new Date().toISOString();
     const connection = await getFacebookConnectionForAdmin(settings.social_accounts.admin_user_id);
     const account = connection.account;
     const selectedPage = connection.selectedPage;
     const automationSettings = await getAutomationSettings(settings.social_account_id);
 
+    if (!systemPostingConfig.configured) {
+      await updateAutomationRunState(settings.social_account_id, {
+        lastAutomationRunAt: now,
+        pauseReason: "Missing META_SYSTEM_USER_ACCESS_TOKEN or META_PAGE_ID for automatic publishing."
+      });
+      continue;
+    }
+
     if (!account || !selectedPage || !automationSettings || account.reconnect_required || account.connection_status !== "connected") {
+      continue;
+    }
+
+    if (selectedPage.facebook_page_id !== systemPostingConfig.pageId) {
+      await updateAutomationRunState(account.id, {
+        lastAutomationRunAt: now,
+        pauseReason: `Selected Facebook page ${selectedPage.facebook_page_id} does not match META_PAGE_ID ${systemPostingConfig.pageId}.`
+      });
       continue;
     }
 
@@ -180,7 +225,7 @@ export async function runDailyAutomation() {
     const existingCount = await countAutomatedPostsForDate(account.id, dayStart, dayEnd);
 
     if (existingCount >= automationSettings.daily_posts_count) {
-      await updateAutomationRunState(account.id, { lastAutomationRunAt: new Date().toISOString(), pauseReason: null });
+      await updateAutomationRunState(account.id, { lastAutomationRunAt: now, pauseReason: null });
       continue;
     }
 
@@ -224,7 +269,7 @@ export async function runDailyAutomation() {
       created += 1;
     }
 
-    await updateAutomationRunState(account.id, { lastAutomationRunAt: new Date().toISOString(), pauseReason: null });
+    await updateAutomationRunState(account.id, { lastAutomationRunAt: now, pauseReason: null });
   }
 
   return { created };

@@ -67,6 +67,7 @@ cp .env.example .env.local
 - Supabase URL + anon key + service role key
 - Stripe secret key + webhook secret
 - Resend API key (opcional, recomendado)
+- Meta/Facebook vars para automatizacion: `NEXT_PUBLIC_FACEBOOK_APP_ID`, `FACEBOOK_APP_SECRET`, `FACEBOOK_TOKEN_ENCRYPTION_KEY`, `SOCIAL_CRON_SECRET`, `META_SYSTEM_USER_ACCESS_TOKEN`, `META_PAGE_ID`
 - URLs y branding de agencia
 
 4. Crear base de datos en Supabase y aplicar esquema:
@@ -184,4 +185,3 @@ https://TU_DOMINIO/api/stripe/webhook
 - `lib/` clientes/config/helpers (Supabase, Stripe, Resend, schemas)
 - `supabase/migrations/` SQL schema + RLS
 - `supabase/seed.sql` seed inicial de planes/add-ons
-

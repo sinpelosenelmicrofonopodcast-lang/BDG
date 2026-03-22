@@ -85,6 +85,8 @@ type WorkspaceProps = {
     appSecret: boolean;
     encryption: boolean;
     cron: boolean;
+    metaSystemUserAccessToken: boolean;
+    metaPageId: boolean;
   };
 };
 
@@ -514,7 +516,8 @@ export function FacebookAutomationWorkspace({
                 <p className="text-xs font-semibold uppercase tracking-[0.18em] text-muted-foreground">Connection health</p>
                 <p className="mt-2 text-lg font-semibold">{connection.account?.reconnect_required ? "Needs attention" : "Healthy"}</p>
                 <p className="mt-1 text-sm text-muted-foreground">
-                  {connection.account?.last_error_message ?? "Tokens stay server-side and all publishing runs through backend routes."}
+                  {connection.account?.last_error_message ??
+                    "Manual posts publish with the stored page token. Automatic posts use META_SYSTEM_USER_ACCESS_TOKEN and META_PAGE_ID from the server."}
                 </p>
               </div>
             </div>
@@ -524,7 +527,9 @@ export function FacebookAutomationWorkspace({
                 { label: "Facebook App ID", ok: envStatus.appId },
                 { label: "Facebook App Secret", ok: envStatus.appSecret },
                 { label: "Token encryption key", ok: envStatus.encryption },
-                { label: "Cron secret", ok: envStatus.cron }
+                { label: "Cron secret", ok: envStatus.cron },
+                { label: "META_SYSTEM_USER_ACCESS_TOKEN", ok: envStatus.metaSystemUserAccessToken },
+                { label: "META_PAGE_ID", ok: envStatus.metaPageId }
               ].map((item) => (
                 <div key={item.label} className="flex items-center justify-between rounded-2xl border border-border px-4 py-3 text-sm">
                   <span>{item.label}</span>
@@ -800,7 +805,7 @@ export function FacebookAutomationWorkspace({
               <div className="mt-3 space-y-3 text-sm text-muted-foreground">
                 <div className="flex items-start gap-3">
                   <CheckCircle2 className="mt-0.5 h-4 w-4 text-status-success" />
-                  <p>All manual and automated publishing runs from server routes with the stored page access token.</p>
+                  <p>Manual publishing uses the stored page access token, while automatic publishing uses META_SYSTEM_USER_ACCESS_TOKEN and META_PAGE_ID on the server.</p>
                 </div>
                 <div className="flex items-start gap-3">
                   <CheckCircle2 className="mt-0.5 h-4 w-4 text-status-success" />
@@ -808,7 +813,7 @@ export function FacebookAutomationWorkspace({
                 </div>
                 <div className="flex items-start gap-3">
                   <AlertTriangle className="mt-0.5 h-4 w-4 text-status-warning" />
-                  <p>If Meta invalidates the token, automation pauses and the module asks for reconnection instead of silently failing.</p>
+                  <p>If META_PAGE_ID does not match the selected page or the automatic token is missing, automation pauses instead of publishing to the wrong destination.</p>
                 </div>
               </div>
             </div>

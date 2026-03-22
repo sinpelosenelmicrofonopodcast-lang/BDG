@@ -23,6 +23,17 @@ export function getFacebookServerConfig() {
   };
 }
 
+export function getFacebookSystemPostingConfig() {
+  const accessToken = process.env.META_SYSTEM_USER_ACCESS_TOKEN ?? "";
+  const pageId = process.env.META_PAGE_ID ?? "";
+
+  return {
+    accessToken,
+    pageId,
+    configured: Boolean(accessToken && pageId)
+  };
+}
+
 export function getSocialCronSecret() {
   return process.env.SOCIAL_CRON_SECRET ?? "";
 }
