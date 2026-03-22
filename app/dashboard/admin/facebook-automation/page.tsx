@@ -81,14 +81,19 @@ export default async function FacebookAutomationPage() {
   const systemPostingConfig = getFacebookSystemPostingConfig();
 
   const [connection, templates, mediaAssets] = await Promise.all([
-    getFacebookConnectionForAdmin(user.id),
-    listFacebookTemplates(),
-    listFacebookMediaAssets(24)
+    getFacebookConnectionForAdmin(user.id).catch(() => ({
+      account: null,
+      selectedPage: null,
+      pages: [],
+      settings: null
+    })),
+    listFacebookTemplates().catch(() => []),
+    listFacebookMediaAssets(24).catch(() => [])
   ]);
 
   const [posts, logs, mediaWithPreview] = await Promise.all([
-    connection.account ? listRecentSocialPosts(connection.account.id, 60) : Promise.resolve([]),
-    connection.account ? listRecentSocialLogs(connection.account.id, 40) : Promise.resolve([]),
+    connection.account ? listRecentSocialPosts(connection.account.id, 60).catch(() => []) : Promise.resolve([]),
+    connection.account ? listRecentSocialLogs(connection.account.id, 40).catch(() => []) : Promise.resolve([]),
     withPreviewUrls(mediaAssets)
   ]);
 

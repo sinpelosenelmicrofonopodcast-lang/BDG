@@ -7,10 +7,14 @@ export function getFacebookPublicConfig() {
   };
 }
 
+export function getFacebookGraphVersion() {
+  return process.env.FACEBOOK_GRAPH_VERSION ?? "v22.0";
+}
+
 export function getFacebookServerConfig() {
   const appId = process.env.NEXT_PUBLIC_FACEBOOK_APP_ID;
   const appSecret = process.env.FACEBOOK_APP_SECRET;
-  const graphVersion = process.env.FACEBOOK_GRAPH_VERSION ?? "v22.0";
+  const graphVersion = getFacebookGraphVersion();
 
   if (!appId || !appSecret) {
     throw new Error("Missing Facebook configuration. Set NEXT_PUBLIC_FACEBOOK_APP_ID and FACEBOOK_APP_SECRET.");

@@ -44,7 +44,15 @@ async function loadPublishImage(postId: string) {
     return null;
   }
 
-  const asset = await getMediaAssetById(post.media_asset_id);
+  return loadPublishImageByAssetId(post.media_asset_id);
+}
+
+async function loadPublishImageByAssetId(mediaAssetId?: string | null) {
+  if (!mediaAssetId) {
+    return null;
+  }
+
+  const asset = await getMediaAssetById(mediaAssetId);
 
   if (!asset) {
     return null;
@@ -63,6 +71,23 @@ async function loadPublishImage(postId: string) {
     filename: asset.path.split("/").pop() ?? "social-image.jpg",
     mimeType: asset.mime_type ?? "image/jpeg"
   };
+}
+
+export async function publishFacebookPostDirect(input: { caption: string; mediaAssetId?: string | null }) {
+  const systemPostingConfig = getFacebookSystemPostingConfig();
+
+  if (!systemPostingConfig.configured) {
+    throw new Error("Missing META_SYSTEM_USER_ACCESS_TOKEN or META_PAGE_ID for Facebook publishing.");
+  }
+
+  const image = await loadPublishImageByAssetId(input.mediaAssetId);
+
+  return createFacebookPost({
+    pageId: systemPostingConfig.pageId,
+    accessToken: systemPostingConfig.accessToken,
+    caption: input.caption,
+    image
+  });
 }
 
 async function resolvePublishTarget(post: SocialPostRecord) {

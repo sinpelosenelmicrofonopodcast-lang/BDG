@@ -179,6 +179,7 @@ export function FacebookAutomationWorkspace({
   const previewImage = localMediaPreview ?? selectedMedia?.previewUrl ?? null;
   const automaticModeReady = envStatus.metaSystemUserAccessToken && envStatus.metaPageId;
   const manualConnectionReady = Boolean(connection.account?.access_token_encrypted && connection.selectedPage && connection.selectedPage.access_token_encrypted !== "__META_SYSTEM_PAGE__");
+  const manualPublishReady = manualConnectionReady || automaticModeReady;
 
   const previewCaption = useMemo(() => {
     if (caption.trim()) {
@@ -758,7 +759,7 @@ export function FacebookAutomationWorkspace({
                 <Clock3 className="mr-2 h-4 w-4" />
                 Schedule post
               </Button>
-              <Button onClick={() => submitPost("publish_now")} disabled={!manualConnectionReady || isPending}>
+              <Button onClick={() => submitPost("publish_now")} disabled={!manualPublishReady || isPending}>
                 <Send className="mr-2 h-4 w-4" />
                 Publish now
               </Button>

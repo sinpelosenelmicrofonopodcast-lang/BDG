@@ -1,6 +1,6 @@
 import "server-only";
 
-import { getFacebookServerConfig } from "@/lib/social/facebook/config";
+import { getFacebookGraphVersion, getFacebookServerConfig } from "@/lib/social/facebook/config";
 import type { FacebookPageOption } from "@/lib/social/facebook/types";
 
 type FacebookApiErrorPayload = {
@@ -61,7 +61,7 @@ export class FacebookServiceError extends Error {
 }
 
 function buildGraphUrl(path: string, searchParams?: URLSearchParams) {
-  const { graphVersion } = getFacebookServerConfig();
+  const graphVersion = getFacebookGraphVersion();
   const url = new URL(`https://graph.facebook.com/${graphVersion}${path}`);
 
   if (searchParams) {
