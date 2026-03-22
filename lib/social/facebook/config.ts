@@ -39,9 +39,9 @@ export function getFacebookSystemPostingConfig() {
 }
 
 export function getSocialCronSecret() {
-  return process.env.SOCIAL_CRON_SECRET ?? "";
+  return process.env.SOCIAL_CRON_SECRET ?? process.env.CRON_SECRET ?? "";
 }
 
 export function hasSocialCronSecret() {
-  return Boolean(process.env.SOCIAL_CRON_SECRET);
+  return Boolean(process.env.SOCIAL_CRON_SECRET ?? process.env.CRON_SECRET);
 }
