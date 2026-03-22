@@ -3,7 +3,6 @@ import { Bot, CalendarClock, FileText, History, LineChart, PlugZap, Wand2 } from
 import { getCurrentUser } from "@/lib/auth";
 import { getFacebookPublicConfig, getFacebookSystemPostingConfig, hasSocialCronSecret } from "@/lib/social/facebook/config";
 import {
-  ensureFacebookSystemAutomationContext,
   listFacebookMediaAssets,
   listFacebookTemplates,
   listRecentSocialLogs,
@@ -80,10 +79,6 @@ export default async function FacebookAutomationPage() {
   }
 
   const systemPostingConfig = getFacebookSystemPostingConfig();
-
-  if (systemPostingConfig.configured) {
-    await ensureFacebookSystemAutomationContext(user.id);
-  }
 
   const [connection, templates, mediaAssets] = await Promise.all([
     getFacebookConnectionForAdmin(user.id),
